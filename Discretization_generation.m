@@ -1,31 +1,30 @@
-T = 20;
-s0 = 0.99;
+%This script generate discretization for SIR model
+T = 20; %Time epoch
+s0 = 0.99; %initial state
 i0 = 0.001;
 r0 = 1-s0-i0;
-beta = 0.2*7;
+beta = 0.2*7; %initial parameter
 theta = 0.25*7;
 gamma = 0.07*7;
-pol = randi(2,T,1)-1;
+pol = randi(2,T,1)-1; %policy
 %pol = zeros(T,1);
-[S,I,R] = SEIR_trj(s0,i0,r0,beta,gamma,T,pol);
 %%
-
+% initialize discretization vector G
 Gs = [0,0.5,1];
 Gi = [0,0.5,1];
 Gr = [0,0.5,1];
-Gs = importdata('Gs_greedy_100.mat');
-Gi = importdata('Gi_greedy_100.mat');
-Gr = importdata('Gr_greedy_100.mat');
-budget = 400*3;
+%Gs = importdata('Gs_greedy_100.mat');
+%Gi = importdata('Gi_greedy_100.mat');
+%Gr = importdata('Gr_greedy_100.mat');
+budget = 50*3;
+%this is sample state and policy file 
 samples = importdata('samples_for_compare.mat');
 pol_samples = importdata('policy_for_compare.mat');
-samples = samples(31:end,:);
-pol_samples = pol_samples(31:end,:);
-
+%samples = samples(31:end,:);
+%pol_samples = pol_samples(31:end,:);
 tic
 [Gs,Gi,Gr,costs] = greedy(budget,Gs,Gi,Gr,samples(1,1),samples(1,2),samples(1,3),beta,gamma,T,samples,pol_samples,pol_samples(1,1:T),S,I,R);
 toc
-[dS,dI,dR] = SEIR_trj_dis(s0,i0,r0,beta, gamma,T,pol,Gs,Gi,Gr);
 %%
 figure
 plot(Gs)
@@ -61,33 +60,6 @@ plot(trj_d)
 %plot(log(costs))
 %ylabel('Log Error')
 %xlabel('Iterations')
-%%
-%{
-s0 = 0.99;
-e0 = 0.005;
-i0 = 0.004;
-r0 = 0.001;
-beta = 0.3;
-theta = 0.25;
-gamma = 0.1;
-pol = randi(2,T,1)-1;
-[S,E,I,R] = SEIR_trj(s0,e0,i0,r0,beta,theta,gamma,T,pol);
-[dS,dE,dI,dR] = SEIR_trj_dis(s0,e0,i0,r0,beta,theta, gamma,T,pol,Gs,Ge,Gi,Gr);
-figure
-trj = zeros(T,4);
-trj(:,1) = S;
-trj(:,2) = E;
-trj(:,3) = I;
-trj(:,4) = R;
-plot(trj)
-figure
-trj_d = zeros(T,4);
-trj_d(:,1) = dS;
-trj_d(:,2) = dE;
-trj_d(:,3) = dI;
-trj_d(:,4) = dR;
-plot(trj_d)
-%}
 %% function: greedy 
 function [Gs,Gi,Gr,costs] = greedy(budget,Gs,Gi,Gr,s0,i0,r0,beta,gamma,T,samples,pol_samples,pol,S,I,R)
     cc_count = 1;    
@@ -259,7 +231,7 @@ function [S,I,R] = SEIR_trj_dis(s0,i0,r0,beta, gamma,T,pol,Gs,Gi,Gr)
         [s0,i0,r0] = SEIR(es0,ei0,er0,beta, gamma,action);
     end
 end
-%% functions: Discrete Time SEIR Model
+%% functions: Discrete Time SIR Model
 function [S,I,R] = SEIR_trj(s0,i0,r0,beta, gamma,T,pol)
     S = zeros(T,1);
     I = zeros(T,1);

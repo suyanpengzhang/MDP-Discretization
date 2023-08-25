@@ -1,20 +1,20 @@
-p0 = importdata('transitions0_greedy.mat');
-p1 = importdata('transitions1_greedy.mat');
+p0 = importdata('transitions0.mat');
+p1 = importdata('transitions1.mat');
 %p0 = p0*p0*p0*p0*p0*p0*p0;
 %p1 = p1*p1*p1*p1*p1*p1*p1;
 %p0u = importdata('transitions0_uniform.mat');
 %p1u = importdata('transitions1_uniform.mat');
 %p0u = p0u*p0u*p0u*p0u*p0u*p0p1u = p1u*p1u*p1u*p1u*p1u*p1u*p1u;
-Gs = importdata('Gs_greedy.mat');
-Gi = importdata('Gi_greedy.mat');
-Gr = importdata('Gr_greedy.mat');
+Gs = importdata('Gs.mat');
+Gi = importdata('Gi.mat');
+Gr = importdata('Gr.mat');
 %Gs = 0:0.005:1;
 %Gi = 0:0.002:0.40;
 %Gi(201)=1;
 %Gr = 0:0.005:1;
-Gsu = 0:0.005:1;
-Giu = 0:0.005:1;
-Gru = 0:0.005:1;
+%Gsu = 0:0.005:1;
+%Giu = 0:0.005:1;
+%Gru = 0:0.005:1;
 beta = 0.2*7;
 theta = 0.25*7;
 gamma = 0.07*7;
@@ -192,13 +192,13 @@ disp('Median Opt Gap')
 disp(median(samples(:,9)))
 %% Uniform
 
-p0 = importdata('transitions0_uniform.mat');
-p1 = importdata('transitions1_uniform.mat');
+p0 = importdata('transitions0.mat');
+p1 = importdata('transitions1.mat');
 P{1} = p0;
 P{2} = p1;
-Gs = 0:0.005:1;
-Gi= 0:0.005:1;
-Gr = 0:0.005:1;
+%Gs = 0:0.005:1;
+%Gi= 0:0.005:1;
+%Gr = 0:0.005:1;
 lgs = length(Gs)-1;
 lgi = length(Gi)-1;
 R = ones(length(p0),2);
@@ -286,100 +286,6 @@ disp(mean(samples1(:,9)))
 disp('Median Opt Gap')
 disp(median(samples1(:,9)))
 
-%% Smart
-p0 = importdata('transitions0_smart.mat');
-p1 = importdata('transitions1_smart.mat');
-P{1} = p0;
-P{2} = p1;
-Gs = importdata('Gs_smart.mat');
-Gi = importdata('Gi_smart.mat');
-Gr = importdata('Gr_smart.mat');
-lgs = length(Gs)-1;
-lgi = length(Gi)-1;
-R = ones(length(p0),2);
-for bs = 1:lgs
-    for bi = 1:lgi
-        idx1 = (bs-1)*lgi+bi;
-        R(idx1,1) = -(Gi(bi)+Gi(bi+1))/2;
-        R(idx1,2) = -(Gi(bi)+Gi(bi+1))/2-costr;
-    end
-end
-[V, policy, cpu_time] = mdp_finite_horizon(P, R, 1, 10);
-%%
-sv = 0.7:0.01:0.99;
-iv = 0.001:0.001:0.01;
-cdata = zeros(length(iv),length(sv));
-t = 1;
-for sidx = 1:length(sv)
-    for iidx = 1:length(iv)
-        %disp(sv(sidx))
-        %disp(iv(iidx))
-        vidx = find_index(sv(sidx),iv(iidx),Gs,Gi);
-        polidx = policy(vidx,t);
-        cdata(iidx,sidx) = polidx-1;
-    end
-end
-h = heatmap(sv,iv,cdata);
-
-h.Title = 'Day 1 -- Bin Allocation';
-h.XLabel = 'S';
-h.YLabel = 'I';
-%%
-samples2 = zeros(num_samples,10);
-for s =1:num_samples
-    samples2(s,1) = samples(s,1);
-    samples2(s,2) = samples(s,2);
-    samples2(s,3) = samples(s,3);
-    rs = samples2(s,1);
-    ri = samples2(s,2);
-    rr = samples2(s,3);
-    idx = find_index(rs,ri,Gs,Gi);
-    samples2(s,4) = policy(idx,1);
-    samples2(s,5) = V(idx,1);
-    mdp_action = policy(idx,:);
-    %disp(optimal_action)
-    %disp(mdp_action)
-    mis_match = 0;
-    for id_find = 1:length(mdp_action)-skip
-        metric = evaluate_brute_force(id_find,rs,ri,beta,gamma,costr);
-        optimal_action = metric(find(metric(:,11) == max(metric(:,11))),1);
-        if mdp_action(id_find) ~= optimal_action(1)
-            mis_match = mis_match + 1;
-        end
-        if id_find == 1
-            samples2(s,7) = max(metric(:,11));
-        end
-    end
-    samples2(s,10) = mis_match;
-    %samples2(s,6) = metric(find(metric(:,11) == max(metric(:,11))),1);
-    %samples2(s,7) = max(metric(:,11));
-    samples2(s,8) = samples2(s,6)-samples2(s,4);
-    s0 = samples2(s,1);
-    i0 = samples2(s,2);
-    r0 = samples2(s,3);
-    cost = 0;
-    for time = 1:10
-        cost = cost -i0;
-        if policy(find_index(s0,i0,Gs,Gi),time)==2
-            cost = cost -costr;
-        end
-        [s0,i0,r0] = SEIR(s0,i0,r0,beta, gamma,policy(find_index(s0,i0,Gs,Gi),time)-1);
-    end
-    samples2(s,9) = abs(cost-samples2(s,7))/abs(samples2(s,7));
-end
-disp('Smart')
-disp('Accuracy All')
-disp(1-sum(samples2(:,10))/(num_samples*8))
-disp('MSE')
-disp(mean((samples2(:,5)-samples2(:,7)).^2))
-disp('Mean Approx Error')
-disp(mean(abs(samples2(:,5)-samples2(:,7))./(abs(samples2(:,7))))) %approxmiation error
-disp('Median Approx Error')
-disp(median(abs(samples2(:,5)-samples2(:,7))./(abs(samples2(:,7))))) %approxmiation error
-disp('Mean Opt Gap')
-disp(mean(samples2(:,9)))
-disp('Median Opt Gap')
-disp(median(samples2(:,9)))
                   
 %%
 sv = 0.7:0.01:1;

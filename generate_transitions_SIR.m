@@ -1,11 +1,11 @@
-%Gs = importdata('Gs_greedy_100.mat');
-%Gi = importdata('Gi_greedy_100.mat');
-%Gr = importdata('Gr_greedy_100.mat');
-Gs = 0:0.01:1;
-Gi = 0:0.01:1;
+Gs = importdata('Gs.mat');
+Gi = importdata('Gi.mat');
+Gr = importdata('Gr.mat');
+%Gs = 0:0.01:1;
+%Gi = 0:0.01:1;
 %Gi = 0:0.002:0.40;
 %Gi(201)=1;
-Gr = 0:0.01:1;
+%Gr = 0:0.01:1;
 %%
 lgs = length(Gs)-1;
 lgi = length(Gi)-1;
@@ -26,7 +26,7 @@ s0 = 0.99;
 i0 = 0.001;
 r0 = 1-s0-i0;
 %%
-%{
+
 count = 1;
 for bs = 1:lgs
     disp(bs)
@@ -101,18 +101,8 @@ for bs = 1:lgs
     end
 end
 transitions1 = transitions;
-%}
-%%
-%transitions0 = importdata('transitions0COVID.mat');
-%transitions0 = transitions;
-%transitions1 = importdata('transitions1.mat');
-%Gs = importdata('Gs_COVID_400.mat');
-%Gi = importdata('Gi_COVID_400.mat');
-%Gr = importdata('Gr_COVID_400.mat');
-%lgs = length(Gs)-1;
-%lgi = length(Gi)-1;
 %% Compute error over samples
-%{
+
 samples = importdata('samples_for_compare.mat');
 pol_samples = importdata('policy_for_compare.mat');
 num_samples = 9;
@@ -167,11 +157,11 @@ for samp =1:num_samples
     errors(samp,1) = err;
 end
 disp('finished')
-%}
+
 
 %% Draw trajectory
-transitions0 = importdata('transitions0_uniform_100.mat');
-transitions1 = importdata('transitions1_uniform_100.mat');
+%transitions0 = importdata('transitions0_uniform_100.mat');
+%transitions1 = importdata('transitions1_uniform_100.mat');
 T=10;
 pol = randi(2,T,1)-1;
 pol = zeros(T,1);
@@ -308,7 +298,6 @@ trj_d(:,3) = R;
 plot(trj_d)
 %plot(trj1)
 %%
-%%
 err = 0;
 for t =1:T
     err = err + (S(t)-trj_s(t))^2;
@@ -316,7 +305,7 @@ for t =1:T
     err = err + (R(t)-trj_r(t))^2;
 end
 disp(err)
-%%
+%% functions
 function [s,i,r] = reverse_find_index(idx,Gs,Gi)
     idx = idx - 1;
     lgs = length(Gs)-1;
