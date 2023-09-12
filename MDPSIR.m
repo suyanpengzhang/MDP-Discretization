@@ -1,13 +1,13 @@
-p0 = importdata('transitions0.mat');
-p1 = importdata('transitions1.mat');
+p0 = importdata('transitions0_greedy_400.mat');
+p1 = importdata('transitions1_greedy_400.mat');
 %p0 = p0*p0*p0*p0*p0*p0*p0;
 %p1 = p1*p1*p1*p1*p1*p1*p1;
 %p0u = importdata('transitions0_uniform.mat');
 %p1u = importdata('transitions1_uniform.mat');
 %p0u = p0u*p0u*p0u*p0u*p0u*p0p1u = p1u*p1u*p1u*p1u*p1u*p1u*p1u;
-Gs = importdata('Gs.mat');
-Gi = importdata('Gi.mat');
-Gr = importdata('Gr.mat');
+Gs = importdata('Gs_greedy_400.mat');
+Gi = importdata('Gi_greedy_400.mat');
+Gr = importdata('Gr_greedy_400.mat');
 %Gs = 0:0.005:1;
 %Gi = 0:0.002:0.40;
 %Gi(201)=1;
@@ -37,7 +37,7 @@ skip = 2;
 sv = 0.7:0.01:0.99;
 iv = 0.001:0.001:0.01;
 cdata = zeros(length(iv),length(sv));
-t = 10;
+t = 2;
 for sidx = 1:length(sv)
     for iidx = 1:length(iv)
         %disp(sv(sidx))
@@ -49,7 +49,7 @@ for sidx = 1:length(sv)
 end
 h = heatmap(sv,iv,cdata);
 
-h.Title = 'Day 10';
+h.Title = 'Day 2';
 h.XLabel = 'S';
 h.YLabel = 'I';
 %%
@@ -192,13 +192,13 @@ disp('Median Opt Gap')
 disp(median(samples(:,9)))
 %% Uniform
 
-p0 = importdata('transitions0.mat');
-p1 = importdata('transitions1.mat');
+p0 = importdata('transitions0_uniform_400.mat');
+p1 = importdata('transitions1_uniform_400.mat');
 P{1} = p0;
 P{2} = p1;
-%Gs = 0:0.005:1;
-%Gi= 0:0.005:1;
-%Gr = 0:0.005:1;
+Gs = 0:0.0025:1;
+Gi= 0:0.0025:1;
+Gr = 0:0.0025:1;
 lgs = length(Gs)-1;
 lgi = length(Gi)-1;
 R = ones(length(p0),2);
