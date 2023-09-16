@@ -16,14 +16,14 @@ Gr = [0,0.5,1];
 %Gs = importdata('Gs_greedy_100.mat');
 %Gi = importdata('Gi_greedy_100.mat');
 %Gr = importdata('Gr_greedy_100.mat');
-budget = 50*3;
+budget = 30*3;
 %this is sample state and policy file 
 samples = importdata('samples_for_compare.mat');
 pol_samples = importdata('policy_for_compare.mat');
 %samples = samples(31:end,:);
 %pol_samples = pol_samples(31:end,:);
 tic
-[Gs,Gi,Gr,costs] = greedy(budget,Gs,Gi,Gr,samples(1,1),samples(1,2),samples(1,3),beta,gamma,T,samples,pol_samples,pol_samples(1,1:T),S,I,R);
+[Gs,Gi,Gr,costs] = greedy(budget,Gs,Gi,Gr,samples(1,1),samples(1,2),samples(1,3),beta,gamma,T,samples,pol_samples,pol_samples(1,1:T));
 toc
 %%
 figure
@@ -61,7 +61,7 @@ plot(trj_d)
 %ylabel('Log Error')
 %xlabel('Iterations')
 %% function: greedy 
-function [Gs,Gi,Gr,costs] = greedy(budget,Gs,Gi,Gr,s0,i0,r0,beta,gamma,T,samples,pol_samples,pol,S,I,R)
+function [Gs,Gi,Gr,costs] = greedy(budget,Gs,Gi,Gr,s0,i0,r0,beta,gamma,T,samples,pol_samples,pol)
     cc_count = 1;    
     iter = 1;
     cutoff  = 10;
@@ -69,6 +69,7 @@ function [Gs,Gi,Gr,costs] = greedy(budget,Gs,Gi,Gr,s0,i0,r0,beta,gamma,T,samples
     costs = [];
     resample = 0; %reamsple s0,e0,i0,r0 every 200 iterations
     pol = zeros(T,1);
+    [S,I,R] = SEIR_trj(s0,i0,r0,beta,gamma,T,pol);
     while length(Gs)+length(Gi)+length(Gr)<budget
         if resample == 10
             iter = 1;
