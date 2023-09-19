@@ -24,9 +24,10 @@ T = 20;
 beta = 0.2*7;
 theta = 0.25*7;
 gamma = 0.07*7;
+%policy_eval = importdata('policy_for_compare.mat');
+%samples_eval = importdata('samples_for_compare.mat');
 policy_eval = importdata('policy_eval.mat');
 samples_eval = importdata('samples_eval.mat');
-
 files_Gs = {'Gs_greedy_30.mat', 'Gs_greedy_50.mat', 'Gs_greedy_100.mat','Gs_greedy_400.mat'};
 files_Gi = {'Gi_greedy_30.mat', 'Gi_greedy_50.mat', 'Gi_greedy_100.mat','Gi_greedy_400.mat'};
 files_Gr = {'Gr_greedy_30.mat', 'Gr_greedy_50.mat', 'Gr_greedy_100.mat','Gr_greedy_400.mat'};
@@ -39,6 +40,7 @@ Greedy_error = zeros(1,4);
 Greedy_error_dis = zeros(1,4);
 Uniform_error = zeros(1,4);
 Uniform_error_dis = zeros(1,4);
+num_samples = 100;
 for ifl = 1:numel(files_Gs)
     file_name = files_Gs{ifl};
     Gs = importdata(file_name);
@@ -54,11 +56,11 @@ for ifl = 1:numel(files_Gs)
     disp(ifl)
     lgs = length(Gs)-1;
     lgi = length(Gi)-1;
-    errors = zeros(100,1);
-    errors_dis = zeros(100,1);
-    for iiii = 1:100
-        disp(iiii)
-        pol = zeros(20,1);%policy_eval(iiii,:);
+    errors = zeros(num_samples,1);
+    errors_dis = zeros(num_samples,1);
+    for iiii = 1:num_samples
+        %disp(iiii)
+        pol = policy_eval(iiii,:);
         s0 = samples_eval(iiii,1);
         i0 = samples_eval(iiii,2);
         r0 = samples_eval(iiii,3);
@@ -102,6 +104,15 @@ for ifl = 1:numel(files_Gs)
             err = err + (I(t)-trj_i(t))^2;
             err = err + (R(t)-trj_r(t))^2;
         end
+        %figure
+        %trj_d = zeros(T,6);
+        %trj_d(:,1) = S;
+        %trj_d(:,2) = I;
+        %trj_d(:,3) = R;
+        %trj_d(:,4) = trj_s;
+        %trj_d(:,5) = trj_i;
+        %strj_d(:,6) = trj_r;
+        %plot(trj_d)
         errors_dis(iiii,1) = err;
         [S,I,R] = SEIR_trj(s0,i0,r0,beta,gamma,T,pol);
         err = 0;
@@ -139,11 +150,11 @@ for ifl = 1:numel(files_Gs)
     disp(ifl)
     lgs = length(Gs)-1;
     lgi = length(Gi)-1;
-    errors = zeros(100,1);
-    errors_dis = zeros(100,1);
-    for iiii = 1:100
-        disp(iiii)
-        pol = zeros(20,1);%policy_eval(iiii,:);
+    errors = zeros(num_samples,1);
+    errors_dis = zeros(num_samples,1);
+    for iiii = 1:num_samples
+        %disp(iiii)
+        policy_eval(iiii,:);
         s0 = samples_eval(iiii,1);
         i0 = samples_eval(iiii,2);
         r0 = samples_eval(iiii,3);
@@ -153,7 +164,6 @@ for ifl = 1:numel(files_Gs)
         idx0 = find_index(s0,i0,Gs,Gi);
         b0 = sparse(1,lgs*lgi);
         b0(1,idx0) = 1;
-        T = 10;
         for t = 1:T
             if pol(t)==0
                 b0 = b0*transitions0;
