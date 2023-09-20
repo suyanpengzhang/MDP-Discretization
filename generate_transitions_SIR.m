@@ -1,6 +1,6 @@
-Gs = importdata('Gs.mat');
-Gi = importdata('Gi.mat');
-Gr = importdata('Gr.mat');
+Gs = importdata('Gs_greedy_400_new.mat');
+Gi = importdata('Gi_greedy_400_new.mat');
+Gr = importdata('Gr_greedy_400_new.mat');
 %Gs = 0:0.01:1;
 %Gi = 0:0.01:1;
 %Gi = 0:0.002:0.40;

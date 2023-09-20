@@ -1,13 +1,13 @@
-p0 = importdata('transitions0_greedy_400.mat');
-p1 = importdata('transitions1_greedy_400.mat');
+p0 = importdata('transition0_greedy_400_new.mat');
+p1 = importdata('transition1_greedy_400_new.mat');
 %p0 = p0*p0*p0*p0*p0*p0*p0;
 %p1 = p1*p1*p1*p1*p1*p1*p1;
 %p0u = importdata('transitions0_uniform.mat');
 %p1u = importdata('transitions1_uniform.mat');
 %p0u = p0u*p0u*p0u*p0u*p0u*p0p1u = p1u*p1u*p1u*p1u*p1u*p1u*p1u;
-Gs = importdata('Gs_greedy_400.mat');
-Gi = importdata('Gi_greedy_400.mat');
-Gr = importdata('Gr_greedy_400.mat');
+Gs = importdata('Gs_greedy_400_new.mat');
+Gi = importdata('Gi_greedy_400_new.mat');
+Gr = importdata('Gr_greedy_400_new.mat');
 %Gs = 0:0.005:1;
 %Gi = 0:0.002:0.40;
 %Gi(201)=1;

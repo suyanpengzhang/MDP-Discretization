@@ -28,11 +28,11 @@ gamma = 0.07*7;
 %samples_eval = importdata('samples_for_compare.mat');
 policy_eval = importdata('policy_eval.mat');
 samples_eval = importdata('samples_eval.mat');
-files_Gs = {'Gs_greedy_30.mat', 'Gs_greedy_50.mat', 'Gs_greedy_100.mat','Gs_greedy_400.mat'};
-files_Gi = {'Gi_greedy_30.mat', 'Gi_greedy_50.mat', 'Gi_greedy_100.mat','Gi_greedy_400.mat'};
-files_Gr = {'Gr_greedy_30.mat', 'Gr_greedy_50.mat', 'Gr_greedy_100.mat','Gr_greedy_400.mat'};
-files_trans0_g = {'transitions0_greedy_30.mat', 'transitions0_greedy_50.mat', 'transitions0_greedy_100.mat','transitions0_greedy_400.mat'};
-files_trans1_g = {'transitions1_greedy_30.mat', 'transitions1_greedy_50.mat', 'transitions1_greedy_100.mat','transitions1_greedy_400.mat'};
+files_Gs = {'Gs_greedy_30.mat', 'Gs_greedy_50.mat', 'Gs_greedy_100.mat','Gs_greedy_400_new.mat'};
+files_Gi = {'Gi_greedy_30.mat', 'Gi_greedy_50.mat', 'Gi_greedy_100.mat','Gi_greedy_400_new.mat'};
+files_Gr = {'Gr_greedy_30.mat', 'Gr_greedy_50.mat', 'Gr_greedy_100.mat','Gr_greedy_400_new.mat'};
+files_trans0_g = {'transitions0_greedy_30.mat', 'transitions0_greedy_50.mat', 'transitions0_greedy_100.mat','transition0_greedy_400_new.mat'};
+files_trans1_g = {'transitions1_greedy_30.mat', 'transitions1_greedy_50.mat', 'transitions1_greedy_100.mat','transition1_greedy_400_new.mat'};
 files_trans0_u = {'transitions0_uniform_30.mat', 'transitions0_uniform_50.mat', 'transitions0_uniform_100.mat','transitions0_uniform_400.mat'};
 files_trans1_u = {'transitions1_uniform_30.mat', 'transitions1_uniform_50.mat', 'transitions1_uniform_100.mat','transitions1_uniform_400.mat'};
 % Loop to load the files
@@ -104,15 +104,6 @@ for ifl = 1:numel(files_Gs)
             err = err + (I(t)-trj_i(t))^2;
             err = err + (R(t)-trj_r(t))^2;
         end
-        %figure
-        %trj_d = zeros(T,6);
-        %trj_d(:,1) = S;
-        %trj_d(:,2) = I;
-        %trj_d(:,3) = R;
-        %trj_d(:,4) = trj_s;
-        %trj_d(:,5) = trj_i;
-        %strj_d(:,6) = trj_r;
-        %plot(trj_d)
         errors_dis(iiii,1) = err;
         [S,I,R] = SEIR_trj(s0,i0,r0,beta,gamma,T,pol);
         err = 0;
@@ -122,9 +113,23 @@ for ifl = 1:numel(files_Gs)
             err = err + (R(t)-trj_r(t))^2;
         end
         errors(iiii,1) = err;
+        %{
+        if ifl>2
+            figure
+            trj_d = zeros(T,6);
+            trj_d(:,1) = S;
+            trj_d(:,2) = I;
+            trj_d(:,3) = R;
+            trj_d(:,4) = trj_s;
+            trj_d(:,5) = trj_i;
+            trj_d(:,6) = trj_r;
+            plot(trj_d)
+        end
+        %}
     end
     Greedy_error_dis(1,ifl) = mean(errors_dis);
     Greedy_error(1,ifl) = mean(errors);
+    %{
     if ifl ==1 
         Gs = 0:0.03333:1;
         Gi= 0:0.03333:1;
@@ -209,6 +214,7 @@ for ifl = 1:numel(files_Gs)
     end
     Uniform_error_dis(1,ifl) = mean(errors_dis);
     Uniform_error(1,ifl) = mean(errors);
+    %}
 end
 
 
