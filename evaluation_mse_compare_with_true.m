@@ -20,6 +20,7 @@ end
 %}
 %% compute error (compare with true)
 % Define the file names
+t_score = tinv(0.975, 99);
 T = 20;
 beta = 0.2*7;
 theta = 0.25*7;
@@ -41,7 +42,7 @@ Greedy_error_dis = zeros(1,4);
 Uniform_error = zeros(1,4);
 Uniform_error_dis = zeros(1,4);
 num_samples = 100;
-for ifl = 1:numel(files_Gs)
+for ifl = 2:numel(files_Gs)
     file_name = files_Gs{ifl};
     Gs = importdata(file_name);
     file_name = files_Gi{ifl};
@@ -129,7 +130,16 @@ for ifl = 1:numel(files_Gs)
     end
     Greedy_error_dis(1,ifl) = mean(errors_dis);
     Greedy_error(1,ifl) = mean(errors);
-    %{
+    ci_dis_low = mean(errors_dis)-(std(errors_dis) / sqrt(100))*t_score;
+    ci_dis_high = mean(errors_dis)+(std(errors_dis) / sqrt(100))*t_score;
+    disp('Greedy_dis CI')
+    disp(ci_dis_low)
+    disp(ci_dis_high)
+    ci_low = mean(errors)-(std(errors) / sqrt(100))*t_score;
+    ci_high = mean(errors)+(std(errors) / sqrt(100))*t_score;
+    disp('Greedy CI')
+    disp(ci_low)
+    disp(ci_high)
     if ifl ==1 
         Gs = 0:0.03333:1;
         Gi= 0:0.03333:1;
@@ -214,7 +224,16 @@ for ifl = 1:numel(files_Gs)
     end
     Uniform_error_dis(1,ifl) = mean(errors_dis);
     Uniform_error(1,ifl) = mean(errors);
-    %}
+    ci_dis_low = mean(errors_dis)-(std(errors_dis) / sqrt(100))*t_score;
+    ci_dis_high = mean(errors_dis)+(std(errors_dis) / sqrt(100))*t_score;
+    disp('Uniform_dis CI')
+    disp(ci_dis_low)
+    disp(ci_dis_high)
+    ci_low = mean(errors)-(std(errors) / sqrt(100))*t_score;
+    ci_high = mean(errors)+(std(errors) / sqrt(100))*t_score;
+    disp('Uniform CI')
+    disp(ci_low)
+    disp(ci_high)
 end
 
 
