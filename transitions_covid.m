@@ -1,11 +1,11 @@
 %Gs = importdata('covid-data/COVIDGs_Greedy_50.mat');
 %Gi = importdata('covid-data/COVIDGi_Greedy_50.mat');
 %Gr = importdata('covid-data/COVIDGr_Greedy_50.mat');
-Gs = 0:0.02:1;
-Gi = 0:0.02:1;
+Gs = 0:0.01:1;
+Gi = 0:0.01:1;
 %Gi = 0:0.02:0.40;
 %Gi(201)=1;
-Gr = 0:0.02:1;
+Gr = 0:0.01:1;
 %%
 lgs = length(Gs)-1;
 lgi = length(Gi)-1;
@@ -22,7 +22,7 @@ r0 = 1-s0-i0;
 [S,I,R] = SEIR(ones(26,1).*s0,ones(26,1).*i0,ones(26,1).*r0,beta, gamma,0);
 [S,I,R] = compute_total_SIR(S,I,R)
 %%
-
+tic
 count = 1;
 for bs = 1:lgs
     disp(bs)
@@ -39,7 +39,7 @@ for bs = 1:lgs
             transitions(idx1,idx2) = transitions(idx1,idx2)+1;
             count = count+1;
         end
-        for iter = 1:100
+        for iter = 1:10000
             rs = Gs(bs)+(Gs(bs+1)-Gs(bs))*rand();
             ri = Gi(bi)+(Gi(bi+1)-Gi(bi))*rand();
             if rs+ri<=1
@@ -79,7 +79,7 @@ for bs = 1:lgs
             transitions(idx1,idx2) = transitions(idx1,idx2)+1;
             count = count+1;
         end
-        for iter = 1:100
+        for iter = 1:10000
             rs = Gs(bs)+(Gs(bs+1)-Gs(bs))*rand();
             ri = Gi(bi)+(Gi(bi+1)-Gi(bi))*rand();
             if rs+ri<=1
@@ -101,7 +101,7 @@ for bs = 1:lgs
     end
 end
 transitions1 = transitions;
-
+toc
 %% Compute error over samples
 %{
 T=40;

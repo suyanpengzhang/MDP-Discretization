@@ -3,11 +3,11 @@ p1 = importdata('covid-data/COVIDtransitions1_Greedy_50.mat');
 Gs = importdata('covid-data/COVIDGs_Greedy_50.mat');
 Gi = importdata('covid-data/COVIDGi_Greedy_50.mat');
 Gr = importdata('covid-data/COVIDGr_Greedy_50.mat');
-p0 = importdata('covid-data/COVIDtransitions0_uniform_50.mat');
-p1 = importdata('covid-data/COVIDtransitions1_uniform_50.mat');
-Gs = 0:0.02:1;
-Gi = 0:0.02:1;
-Gr = 0:0.02:1;
+%p0 = importdata('covid-data/COVIDtransitions0_uniform_50.mat');
+%p1 = importdata('covid-data/COVIDtransitions1_uniform_50.mat');
+%Gs = 0:0.02:1;
+%Gi = 0:0.02:1;
+%Gr = 0:0.02:1;
 file_path = 'covid-data/beta.csv';
 % Load the CSV file into a MATLAB array
 beta = readmatrix(file_path);
@@ -17,7 +17,7 @@ P{2} = p1;
 lgs = length(Gs)-1;
 lgi = length(Gi)-1;
 R = ones(length(p0),2);
-costr = 0.03;
+costr = 0.005;
 for bs = 1:lgs
     for bi = 1:lgi
         idx1 = (bs-1)*lgi+bi;
@@ -82,7 +82,7 @@ function idx = find_index(s,i,Gs,Gi)
     lgs = length(Gs)-1;
     lgi = length(Gi)-1;
     ls = max(find(Gs<s));
-    li = max(find(Gi<i));
+    li = max(find(Gi<=i));
     idx = (ls-1)*(lgi)+li;
 end
 

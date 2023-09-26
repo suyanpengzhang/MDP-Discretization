@@ -1,4 +1,4 @@
-%This script generate discretization for SIR model
+g%This script generate discretization for SIR model
 T = 40; %Time epoch
 s0 = ones(26,1).*0.99; %initial state
 i0 = ones(26,1).*0.0001;
@@ -21,7 +21,10 @@ pol = zeros(T,1);
 pol(2:10,1) = 1;
 [S,I,R] = SEIR_trj(s0,i0,r0,beta,gamma,T,pol);
 [S,I,R] = compute_total_SIR(S,I,R,T);
-trj = zeros(T,9);
+pol0 = zeros(T,1);
+[S0,I0,R0] = SEIR_trj(s0,i0,r0,beta,gamma,T,pol0);
+[S0,I0,R0] = compute_total_SIR(S0,I0,R0,T);
+trj = zeros(T,12);
 trj(:,1) = Greedyres(:,1);
 trj(:,2) = Greedyres(:,2);
 trj(:,3) = Greedyres(:,3);
@@ -31,30 +34,45 @@ trj(:,6) = Uniformres(:,3);
 trj(:,7) = S;
 trj(:,8) = I;
 trj(:,9) = R;
+trj(:,10) = S0;
+trj(:,11) = I0;
+trj(:,12) = R0;
 figure
-plot(time,trj(:,1),'r', ...
-    time,trj(:,2),'k', ...
-    time,trj(:,3),'b', ...
-    time,trj(:,4),'r--', ...
-    time,trj(:,5),'k--', ...
-    time,trj(:,6),'b--', ...
-    time,trj(:,7),'r:', ...
-    time,trj(:,8),'k:', ...
-    time,trj(:,9),'b:', ...
+plot(time,trj(:,2),'r', ...
+    time,trj(:,5),'b--', ...
+    time,trj(:,8),'g:', ...
+    time,trj(:,11),'k-.', ...
     'LineWidth',3);
 ax = gca;
 ax.FontSize = 16; 
-title({'Uniform Discretization'},'Fontsize',18)
+title({'Proportions of Infectious over Time'},'Fontsize',18)
 xlabel('Time: week','FontSize',18)
 ylabel('Proportions','FontSize',18)
-legend('Greedy S', 'Greedy I','Greedy R', ...
-    'Uniform S','Uniform I','Uniform R', ...
-    'Acutal S','Actual I','Actual R','Fontsize',14)
+legend('Greedy policy', ...
+    'Uniform policy', ...
+    'Acutal policy', ...
+    'No intervention','Fontsize',14)
+figure
+plot(time,trj(:,1),'r', ...
+    time,trj(:,4),'b--', ...
+    time,trj(:,7),'g:', ...
+    time,trj(:,10),'k-.', ...
+    'LineWidth',3);
+ax = gca;
+ax.FontSize = 16; 
+title({'Proportions of Susceptible over Time'},'Fontsize',18)
+xlabel('Time: week','FontSize',18)
+ylabel('Proportions','FontSize',18)
+legend('Greedy policy', ...
+    'Uniform policy', ...
+    'Acutal policy', ...
+    'No intervention','Fontsize',14)
 obj = zeros(T,3);
 for t = 1:T
-    obj(t,1)=-trj(t,2)-0.03*Greedyres(t,4);
-    obj(t,2)=-trj(t,5)-0.03*Uniformres(t,4);
-    obj(t,3)=-trj(t,8)-0.03*pol(t,1);
+    obj(t,1)=-trj(t,2)-0.005*Greedyres(t,4);
+    obj(t,2)=-trj(t,5)-0.005*Uniformres(t,4);
+    obj(t,3)=-trj(t,8)-0.005*pol(t,1);
+    obj(t,4)=-trj(t,11)-0.005*pol0(t,1);
 end
 disp('Greedy')
 disp(sum(obj(:,1)))
@@ -62,7 +80,19 @@ disp('Uniform')
 disp(sum(obj(:,2)))
 disp('Actual')
 disp(sum(obj(:,3)))
+disp('No intervention')
+disp(sum(obj(:,4)))
+figure
+x = categorical({'Greedy' 'Uniform' 'Actual' 'Do nothing'});
+x = reordercats(x,{'Greedy' 'Uniform' 'Actual' 'Do nothing'});
+bar(x,sum(obj,1))
+text(1:length(sum(obj,1)),sum(obj,1)-0.05,num2str(round(sum(obj,1),4)'),'vert','bottom','horiz','center','FontSize',16); 
 
+ax = gca;
+ax.FontSize = 16; 
+title({'Objective Across Different Models'},'Fontsize',18)
+xlabel('Policy','FontSize',18)
+ylabel('Objective value','FontSize',18)
 %% functions: Discrete Time SIR Model
 function [S,I,R] = SEIR_trj(s0,i0,r0,beta, gamma,T,pol)
     S = zeros(T,26);

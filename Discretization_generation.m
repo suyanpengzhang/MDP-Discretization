@@ -13,15 +13,15 @@ pol = randi(2,T,1)-1; %policy
 Gs = [0,0.5,1];
 Gi = [0,0.5,1];
 Gr = [0,0.5,1];
-Gs = importdata('Gs_greedy_100.mat');
-Gi = importdata('Gi_greedy_100.mat');
-Gr = importdata('Gr_greedy_100.mat');
-budget = 400*3;
+%Gs = importdata('Gs_greedy_100.mat');
+%Gi = importdata('Gi_greedy_100.mat');
+%Gr = importdata('Gr_greedy_100.mat');
+budget = 100*3;
 %this is sample state and policy file 
 samples = importdata('samples_for_compare.mat');
 pol_samples = importdata('policy_for_compare.mat');
-samples = samples(31:end,:);
-pol_samples = pol_samples(31:end,:);
+%samples = samples(31:end,:);
+%pol_samples = pol_samples(31:end,:);
 tic
 [Gs,Gi,Gr,costs] = greedy(budget,Gs,Gi,Gr,samples(1,1),samples(1,2),samples(1,3),beta,gamma,T,samples,pol_samples,pol_samples(1,1:T));
 toc
@@ -75,7 +75,6 @@ function [Gs,Gi,Gr,costs] = greedy(budget,Gs,Gi,Gr,s0,i0,r0,beta,gamma,T,samples
             iter = 1;
             resample = 0;
             s0= samples(cc_count+1,1);
-            %e0 = 0.001 + rand()*0.099;
             i0 = samples(cc_count+1,2);
             if s0+i0>1
                 s0 = s0/(s0+i0);
@@ -97,7 +96,7 @@ function [Gs,Gi,Gr,costs] = greedy(budget,Gs,Gi,Gr,s0,i0,r0,beta,gamma,T,samples
             disp(length(Gs)+length(Gi)+length(Gr))
             worst_ = [0,1,1];%worst cut 1. value 2. dim 3 index
             best_ = [100,1,1];
-            for dim = 1:4
+            for dim = 1:3
                 if dim == 1
                     max_idx = length(Gs)-1;
                 elseif dim == 2
@@ -122,7 +121,7 @@ function [Gs,Gi,Gr,costs] = greedy(budget,Gs,Gi,Gr,s0,i0,r0,beta,gamma,T,samples
                 end
             end
         end
-        if iter >= cutoff
+        if iter >= cutoff && abs(old_cost - best_(1))>0.001
             if worst_(1)>best_(1)
                 disp(worst_(1))
                 disp(best_(1))
@@ -193,7 +192,12 @@ end
 
 %% function: cost
 function cost = cost_function(S,I,R,S1,I1,R1)
-    cost = sum((S1-S).^2)+sum((I1-I).^2)+sum((R1-R).^2);
+    for t = 2:size(S,1)-1
+        if (S(t,1)-S(t+1,1))/S(t,1) <0.001
+            break
+        end
+    end
+    cost = sum((S1(1:t,1)-S(1:t,1)).^2)+sum((I1(1:t,1)-I(1:t,1)).^2)+sum((R1(1:t,1)-R(1:t,1)).^2);
 end
 %% functions: Discretized Discrete Time SEIR Model
 %G is the discretization matrix
