@@ -1,11 +1,11 @@
 %Gs = importdata('covid-data/COVIDGs_Greedy_50.mat');
 %Gi = importdata('covid-data/COVIDGi_Greedy_50.mat');
 %Gr = importdata('covid-data/COVIDGr_Greedy_50.mat');
-Gs = 0:0.01:1;
-Gi = 0:0.01:1;
+Gs = 0:0.03333:1;
+Gi = 0:0.03333:1;
 %Gi = 0:0.02:0.40;
 %Gi(201)=1;
-Gr = 0:0.01:1;
+Gr = 0:0.03333:1;
 %%
 lgs = length(Gs)-1;
 lgi = length(Gi)-1;
