@@ -8,26 +8,44 @@ Gr = importdata('covid-data/COVIDGr_Greedy_50.mat');
 %Gs = 0:0.02:1;
 %Gi = 0:0.02:1;
 %Gr = 0:0.02:1;
-T=40;
+lgs = length(Gs)-1;
+lgi = length(Gi)-1;
+%in the order of historical action 00,01,10,11
+P0 = sparse(lgs*lgi*4,lgs*lgi*4);
+P1 = sparse(lgs*lgi*4,lgs*lgi*4);
+P0(1:lgs*lgi,1:lgs*lgi) = p0;%given action 0 00->00
+P0(lgs*lgi+1:2*lgs*lgi,2*lgs*lgi+1:3*lgs*lgi) = p0;%given action 0 01->10
+P0(2*lgs*lgi+1:3*lgs*lgi,2*lgs*lgi+1:3*lgs*lgi) = p0;%given action 0 10->10
+P0(3*lgs*lgi+1:4*lgs*lgi,2*lgs*lgi+1:3*lgs*lgi) = p0;%given action 0 11->10
+P1(1:lgs*lgi,lgs*lgi+1:2*lgs*lgi) = p1;%given action 1 00->01
+P1(lgs*lgi+1:2*lgs*lgi,3*lgs*lgi+1:4*lgs*lgi) = p1;%given action 1 01->11
+P1(2*lgs*lgi+1:3*lgs*lgi,2*lgs*lgi+1:3*lgs*lgi) = p1;%given action 0 10->10
+P1(3*lgs*lgi+1:4*lgs*lgi,3*lgs*lgi+1:4*lgs*lgi) = p1;%given action 1 11->11
+T=60;
 file_path = 'covid-data/beta.csv';
 % Load the CSV file into a MATLAB array
 beta = readmatrix(file_path);
 gamma = 0.7048;
-P{1} = p0;
-P{2} = p1;
-lgs = length(Gs)-1;
-lgi = length(Gi)-1;
-R = ones(length(p0),2);
+P{1} = P0;
+P{2} = P1;
+R = ones(length(P0),2);
 costr = 0.005;
 for bs = 1:lgs
     for bi = 1:lgi
         idx1 = (bs-1)*lgi+bi;
-        R(idx1,1) = -(Gi(bi)+Gi(bi+1))/2;
+        R(idx1,1) = -(Gi(bi)+Gi(bi+1))/2;%00
         R(idx1,2) = -(Gi(bi)+Gi(bi+1))/2-costr;
+        R(lgs*lgi+idx1,1) = -(Gi(bi)+Gi(bi+1))/2;%01
+        R(lgs*lgi+idx1,2) = -(Gi(bi)+Gi(bi+1))/2-costr;
+        R(2*lgs*lgi+idx1,1) = -(Gi(bi)+Gi(bi+1))/2;%10
+        R(2*lgs*lgi+idx1,2) = -(Gi(bi)+Gi(bi+1))/2-99999;% a very large number so this action is infesaible
+        R(3*lgs*lgi+idx1,1) = -(Gi(bi)+Gi(bi+1))/2;%11
+        R(3*lgs*lgi+idx1,2) = -(Gi(bi)+Gi(bi+1))/2-costr;
     end
 end
 skip = 0;
 [V, policy, cpu_time] = mdp_finite_horizon(P, R, 1, T);
+%% recovery the policies
 s0 = 0.9999*ones(26,1);
 i0 = 0.0001*ones(26,1);
 r0 = 0*ones(26,1);
@@ -38,14 +56,44 @@ RR = zeros(T,1);
 %disp(V(idx,1));
 obj = 0;
 actions = zeros(T,1);
+stateflag = 1; %1-00 2-01 3-10 4-11
 for t =1:T
     obj = obj + i0;
     [ss,ii,rr] = compute_total_SIR(s0,i0,r0);
     SS(t,1) = ss;
     II(t,1) = ii;
     RR(t,1) = rr;
-    idx = find_index(ss,ii,Gs,Gi);
+    if stateflag == 1
+        idx = find_index(ss,ii,Gs,Gi);
+    elseif stateflag == 2
+        idx = find_index(ss,ii,Gs,Gi)+lgs*lgi;
+    elseif stateflag == 3
+        idx = find_index(ss,ii,Gs,Gi)+2*lgs*lgi;
+    else 
+        idx = find_index(ss,ii,Gs,Gi)+3*lgs*lgi;
+    end
     pol = policy(idx,t)-1;
+    if stateflag == 1
+        if pol ==0
+            stateflag = 1;
+        else
+            stateflag = 2;
+        end
+    elseif stateflag == 2
+        if pol ==0
+            stateflag = 3;
+        else
+            stateflag = 4;
+        end
+    elseif stateflag == 3
+        stateflag =3;
+    else
+        if pol ==0
+            stateflag = 3;
+        else
+            stateflag = 4;
+        end
+    end
     actions(t,1) = pol;
     [s0,i0,r0] = SEIR(s0,i0,r0,beta, gamma,pol);
     %[s0,i0,r0] = compute_total_SIR(S,I,R);
@@ -58,15 +106,7 @@ trj(:,3) = RR;
 trj(:,4) = actions;
 plot(trj)
 disp(obj)
-%%
-s0 = 0.9999;
-i0 = 0.0001;
-r0 = 0;
-idx = find_index(s0,i0,Gs,Gi);
-disp('cicebceiewbc')
-disp(V(idx,1))
-%%
-
+%% functions
 function [s,i,r] = reverse_find_index(idx,Gs,Gi)
     idx = idx - 1;
     lgs = length(Gs)-1;

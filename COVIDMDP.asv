@@ -8,7 +8,7 @@ Gr = importdata('covid-data/COVIDGr_Greedy_50.mat');
 %Gs = 0:0.02:1;
 %Gi = 0:0.02:1;
 %Gr = 0:0.02:1;
-T=40;
+T=60;
 file_path = 'covid-data/beta.csv';
 % Load the CSV file into a MATLAB array
 beta = readmatrix(file_path);
@@ -31,14 +31,14 @@ skip = 0;
 s0 = 0.9999*ones(26,1);
 i0 = 0.0001*ones(26,1);
 r0 = 0*ones(26,1);
-SS = zeros(T,1);
-II = zeros(T,1);
-RR = zeros(T,1);
+SS = zeros(40,1);
+II = zeros(40,1);
+RR = zeros(40,1);
 %idx = find_index(s0,i0,Gs,Gi);
 %disp(V(idx,1));
 obj = 0;
-actions = zeros(T,1);
-for t =1:T
+actions = zeros(40,1);
+for t =1:40
     obj = obj + i0;
     [ss,ii,rr] = compute_total_SIR(s0,i0,r0);
     SS(t,1) = ss;
@@ -51,7 +51,7 @@ for t =1:T
     %[s0,i0,r0] = compute_total_SIR(S,I,R);
 end
 figure
-trj = zeros(T,4);
+trj = zeros(40,4);
 trj(:,1) = SS;
 trj(:,2) = II;
 trj(:,3) = RR;
