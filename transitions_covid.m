@@ -1,11 +1,15 @@
-%Gs = importdata('covid-data/COVIDGs_Greedy_50.mat');
-%Gi = importdata('covid-data/COVIDGi_Greedy_50.mat');
-%Gr = importdata('covid-data/COVIDGr_Greedy_50.mat');
-Gs = 0:0.03333:1;
-Gi = 0:0.03333:1;
+Gs = importdata('covid-data/COVIDGs_Greedy_200.mat');
+Gi = importdata('covid-data/COVIDGi_Greedy_200.mat');
+Gr = importdata('covid-data/COVIDGr_Greedy_200.mat');
+%Gs = 0:0.02:1;
+%Gi = 0:0.02:1;
+%Gi(51)=1;
+%Gr = 0:0.02:1;
+%Gs = 0:0.03333:1;
+%Gi = 0:0.03333:1;
 %Gi = 0:0.02:0.40;
 %Gi(201)=1;
-Gr = 0:0.03333:1;
+%Gr = 0:0.03333:1;
 %%
 lgs = length(Gs)-1;
 lgi = length(Gi)-1;
@@ -15,7 +19,7 @@ file_path = 'covid-data/beta.csv';
 beta = readmatrix(file_path);
 gamma = 0.7048;
 
-s0 = 0.99;
+s0 = 0.9999;
 i0 = 0.0001;
 r0 = 1-s0-i0;
 %%
@@ -39,7 +43,7 @@ for bs = 1:lgs
             transitions(idx1,idx2) = transitions(idx1,idx2)+1;
             count = count+1;
         end
-        for iter = 1:10000
+        for iter = 1:1000
             rs = Gs(bs)+(Gs(bs+1)-Gs(bs))*rand();
             ri = Gi(bi)+(Gi(bi+1)-Gi(bi))*rand();
             if rs+ri<=1
@@ -79,7 +83,7 @@ for bs = 1:lgs
             transitions(idx1,idx2) = transitions(idx1,idx2)+1;
             count = count+1;
         end
-        for iter = 1:10000
+        for iter = 1:1000
             rs = Gs(bs)+(Gs(bs+1)-Gs(bs))*rand();
             ri = Gi(bi)+(Gi(bi+1)-Gi(bi))*rand();
             if rs+ri<=1

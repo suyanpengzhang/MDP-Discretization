@@ -8,7 +8,7 @@ Gr = importdata('covid-data/COVIDGr_Greedy_50.mat');
 %Gs = 0:0.02:1;
 %Gi = 0:0.02:1;
 %Gr = 0:0.02:1;
-T=40;
+T=60;
 file_path = 'covid-data/beta.csv';
 % Load the CSV file into a MATLAB array
 beta = readmatrix(file_path);

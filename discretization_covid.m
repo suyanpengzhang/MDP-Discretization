@@ -1,13 +1,13 @@
 %This script generate discretization for SIR model
-T = 40; %Time epoch
-s0 = ones(26,1).*0.99; %initial state
+T = 60; %Time epoch
+s0 = ones(26,1).*0.9999; %initial state
 i0 = ones(26,1).*0.0001;
 r0 = ones(26,1)-s0-i0;
 % Specify the path to the CSV file
 file_path = 'covid-data/beta.csv';
 % Load the CSV file into a MATLAB array
 beta = readmatrix(file_path);
-beta = beta.*0.8;
+%beta = beta.*0.8;
 gamma = 0.7048;
 pol = randi(2,T,1)-1; %policy
 %pol = zeros(T,1);
@@ -16,14 +16,21 @@ pol = randi(2,T,1)-1; %policy
 Gs = [0,0.5,1];
 Gi = [0,0.5,1];
 Gr = [0,0.5,1];
-%\Gs = importdata('Gs_greedy_100.mat');
+%Gs = importdata('Gs_greedy_100.mat');
 %Gi = importdata('Gi_greedy_100.mat');
 %Gr = importdata('Gr_greedy_100.mat');
 budget = 50*3;
 %this is sample state and policy file 
 samples = importdata('samples_for_compare.mat');
-pol_samples = randi(2,150,T);
-pol_samples(1,:) = zeros(1,40);
+pol_samples = randi(2,150,T)-1;
+pol_samples(1,:) = zeros(1,T);
+%for i=1:150
+%    pol_samples(i,:) = zeros(1,T);
+%end
+%%
+[s,i,r] = SEIR_trj(s0,i0,r0,beta, gamma,T,zeros(1,T));
+%%
+
 tic
 [Gs,Gi,Gr,costs] = greedy(budget,Gs,Gi,Gr,samples(1,1),samples(1,2),samples(1,3),beta,gamma,T,samples,pol_samples,pol_samples(1,1:T));
 toc
@@ -81,7 +88,7 @@ function [Gs,Gi,Gr,costs] = greedy(budget,Gs,Gi,Gr,s0,i0,r0,beta,gamma,T,samples
             resample = 0;
             s0= samples(cc_count+1,1);
             i0 = samples(cc_count+1,2);
-            %s0 = 0.99;
+            %s0 = 0.999;
             %i0 = 0.0001;
             if s0+i0>1
                 s0 = s0/(s0+i0);
@@ -202,7 +209,10 @@ function cost = cost_function(S,I,R,S1,I1,R1)
             break
         end
     end
+    %cost = sum((S1(1:t,1)-S(1:t,1)).^2)+sum((I1(1:t,1)-I(1:t,1)).^2)+sum((R1(1:t,1)-R(1:t,1)).^2);
+    %T = 20;
     cost = sum((S1(1:t,1)-S(1:t,1)).^2)+sum((I1(1:t,1)-I(1:t,1)).^2)+sum((R1(1:t,1)-R(1:t,1)).^2);
+
 end
 %% functions: Discretized Discrete Time SEIR Model
 %G is the discretization matrix
@@ -211,6 +221,12 @@ function [S,I,R] = SEIR_trj_dis(s0,i0,r0,beta, gamma,T,pol,Gs,Gi,Gr)
     I = zeros(T,26);
     R = zeros(T,26);
     for t = 1:T
+        %begin modify
+        [s0,i0,r0] = compute_total_SIR_single(s0,i0,r0);
+        s0 = s0.*ones(26,1);
+        i0 = i0.*ones(26,1);
+        r0 = r0.*ones(26,1);
+        %end modify
         for i = 1:26
             if s0(i,1) <= 0
                 es0 = (Gs(1));
@@ -252,9 +268,20 @@ function [S,I,R] = SEIR_trj(s0,i0,r0,beta, gamma,T,pol)
         R(t,:) = r0;
         action = pol(t);
         [s0,i0,r0] = SEIR(s0,i0,r0,beta, gamma,action);
+        %begin modify
+        %[s0,i0,r0] = compute_total_SIR_single(s0,i0,r0);
+        %s0 = s0.*ones(26,1);
+        %i0 = i0.*ones(26,1);
+        %r0 = r0.*ones(26,1);
+        %end modify
     end
 end
-
+function [S_,I_,R_] = compute_total_SIR_single(S,I,R)
+    totalpop = [420697,443569,344450,526877,899111,339399,419797,308499,140361,547523,354750,479505,287613,666399,278815,193899,166374,379199,356465,195082,407864,321720,201739,411617,469439,465691];
+    S_ = sum(transpose(totalpop).*S)/sum(totalpop);
+    I_ = sum(transpose(totalpop).*I)/sum(totalpop);
+    R_ = sum(transpose(totalpop).*R)/sum(totalpop);
+end
 function [S,I,R] = SEIR(s0,i0,r0,beta, gamma,action)
     delta_t = 1;
     S = zeros(26,1);
