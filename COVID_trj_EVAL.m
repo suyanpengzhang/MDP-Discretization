@@ -20,6 +20,7 @@ for i = 1:T
     time(i)=i;    
 end
 pol = zeros(T,1);
+Greedyres = importdata("covid-data/greedy_res.mat");
 pol = Greedyres(:,4);
 %pol(7:48,1)=1;
 %pol=randi(2,T,1)-1;

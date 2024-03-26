@@ -41,7 +41,7 @@ Greedy_error = zeros(1,4);
 Greedy_error_dis = zeros(1,4);
 Uniform_error = zeros(1,4);
 Uniform_error_dis = zeros(1,4);
-num_samples = 100;
+num_samples = 1000;
 for ifl = 4:numel(files_Gs)
     file_name = files_Gs{ifl};
     Gs = importdata(file_name);
@@ -71,7 +71,7 @@ for ifl = 4:numel(files_Gs)
         idx0 = find_index(s0,i0,Gs,Gi);
         b0 = sparse(1,lgs*lgi);
         b0(1,idx0) = 1;
-        T = 20;
+        T = 10;
         for t = 1:T
             if pol(t)==0
                 b0 = b0*transitions0;

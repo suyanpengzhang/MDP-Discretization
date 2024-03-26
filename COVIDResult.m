@@ -9,15 +9,19 @@ file_path = 'covid-data/beta.csv';
 beta = readmatrix(file_path);
 gamma = 0.7048;
 costr = 0.005;
-Greedyres = importdata('covid-data/greedy_resconstrained.mat');
-Uniformres = importdata('covid-data/uniform_resconstrained.mat');
+Greedyres1 = importdata('covid-data/greedy_resconstrained.mat');
+Uniformres1 = importdata('covid-data/uniform_resconstrained.mat');
+Greedyres = importdata('covid-data/greedy_res.mat');
+Uniformres = importdata('covid-data/uniform_res.mat');
 %%
-cdata = zeros(T,3);
-cdata(3:10,3) = 1;
-cdata(:,2) = Uniformres(:,4);
-cdata(:,1) = Greedyres(:,4);
+cdata = zeros(T,5);
+cdata(3:10,1) = 1;
+cdata(:,3) = Uniformres(:,4);
+cdata(:,2) = Greedyres(:,4);
+cdata(:,5) = Uniformres1(:,4);
+cdata(:,4) = Greedyres1(:,4);
 cdata = transpose(cdata);
-xvalues = {'Greedy','Uniform','Actual'};
+xvalues = {'Actual','Greedy','Uniform','Greedy -- 2 switch','Uniform -- 2 switch'};
 yvalues = cell(1,T);
 yvalues(:,:)={0};
 ytik = cell(1,T);
@@ -38,9 +42,9 @@ h.XDisplayLabels = ytik;
 h.Title = 'Lockdown policy over time';
 s = struct(h);
 s.XAxis.TickLabelRotation = 0;   % horizontal
-h.Position=[0.1300 0.1100 0.8179 0.159];
+%h.Position=[0.1300 0.1100 0.8179 0.159];
 h.XLabel = ('Week'); 
-h.FontSize =14;
+h.FontSize =18;
 h.ColorbarVisible = 'off';
 %h = heatmap(cdata);
 %%
@@ -176,13 +180,14 @@ legend('Greedy policy', ...
     'Acutal policy', ...
     'No intervention','Fontsize',14)
 num_infections = zeros(T,4);
-obj = zeros(T,3);
+obj = zeros(T,4);
 for t = 1:T
     obj(t,1)=-trj(t,2)-costr*Greedyres(t,4);
     obj(t,2)=-trj(t,5)-costr*Uniformres(t,4);
     obj(t,3)=-trj(t,8)-costr*pol(t,1);
     obj(t,4)=-trj(t,11)-costr*pol0(t,1);
 end
+obj = -obj;
 disp('Greedy')
 disp(sum(obj(:,1)))
 disp('Uniform')
@@ -195,8 +200,8 @@ figure
 x = categorical({'Greedy' 'Uniform' 'Actual' 'Do nothing'});
 x = reordercats(x,{'Greedy' 'Uniform' 'Actual' 'Do nothing'});
 bar(x,sum(obj,1))
-text(1:length(sum(obj,1)),sum(obj,1)-0.05,num2str(round(sum(obj,1),4)'),'vert','bottom','horiz','center','FontSize',16); 
-ylim([-1 0]);
+text(1:length(sum(obj,1)),sum(obj,1)+0.07,num2str(round(sum(obj,1),4)'),'vert','top','horiz','center','FontSize',16); 
+ylim([0 1]);
 ax = gca;
 ax.FontSize = 16; 
 title({'Objective Across Different Models'},'Fontsize',18)

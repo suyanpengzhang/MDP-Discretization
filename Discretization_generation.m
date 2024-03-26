@@ -16,7 +16,7 @@ Gr = [0,0.5,1];
 %Gs = importdata('Gs_greedy_100.mat');
 %Gi = importdata('Gi_greedy_100.mat');
 %Gr = importdata('Gr_greedy_100.mat');
-budget = 100*3;
+budget = 20*3;
 %this is sample state and policy file 
 samples = importdata('samples_for_compare.mat');
 pol_samples = importdata('policy_for_compare.mat');

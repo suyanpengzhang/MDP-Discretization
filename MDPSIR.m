@@ -1,13 +1,13 @@
-p0 = importdata('transition0_greedy_400_new.mat');
-p1 = importdata('transition1_greedy_400_new.mat');
+p0 = importdata('transitions0_greedy_400.mat');
+p1 = importdata('transitions1_greedy_400.mat');
 %p0 = p0*p0*p0*p0*p0*p0*p0;
 %p1 = p1*p1*p1*p1*p1*p1*p1;
 %p0u = importdata('transitions0_uniform.mat');
 %p1u = importdata('transitions1_uniform.mat');
 %p0u = p0u*p0u*p0u*p0u*p0u*p0p1u = p1u*p1u*p1u*p1u*p1u*p1u*p1u;
-Gs = importdata('Gs_greedy_400_new.mat');
-Gi = importdata('Gi_greedy_400_new.mat');
-Gr = importdata('Gr_greedy_400_new.mat');
+Gs = importdata('Gs_greedy_400.mat');
+Gi = importdata('Gi_greedy_400.mat');
+Gr = importdata('Gr_greedy_400.mat');
 %Gs = 0:0.005:1;
 %Gi = 0:0.002:0.40;
 %Gi(201)=1;
@@ -34,10 +34,11 @@ end
 skip = 0;
 [V, policy, cpu_time] = mdp_finite_horizon(P, R, 1, 10);
 %%
+
 sv = 0.7:0.01:0.99;
 iv = 0.001:0.001:0.01;
 cdata = zeros(length(iv),length(sv));
-t = 2;
+t = 5;
 for sidx = 1:length(sv)
     for iidx = 1:length(iv)
         %disp(sv(sidx))
@@ -48,10 +49,13 @@ for sidx = 1:length(sv)
     end
 end
 h = heatmap(sv,iv,cdata);
-
-h.Title = 'Day 2';
-h.XLabel = 'S';
-h.YLabel = 'I';
+sv_greedy = sv;
+iv_greedy = iv;
+cdata_greedy = cdata;
+h.Title = 'Week 5 -- Greedy';
+h.XLabel = 'Susceptible Proportions';
+h.YLabel = 'Infectious Proportions';
+h.NodeChildren(3).YDir='normal'; 
 %%
 %{
 samples = importdata('samples_for_compare.mat');
@@ -214,7 +218,7 @@ end
 sv = 0.7:0.01:0.99;
 iv = 0.001:0.001:0.01;
 cdata = zeros(length(iv),length(sv));
-t = 10;
+t = 5;
 for sidx = 1:length(sv)
     for iidx = 1:length(iv)
         %disp(sv(sidx))
@@ -224,11 +228,13 @@ for sidx = 1:length(sv)
         cdata(iidx,sidx) = polidx-1;
     end
 end
+figure
 h = heatmap(sv,iv,cdata);
-
-h.Title = 'Day 10 -- Uniform';
-h.XLabel = 'S';
-h.YLabel = 'I';
+cdata_uniform = cdata;
+h.Title = 'Week 5 -- Uniform';
+h.XLabel = 'Susceptible Proportions';
+h.YLabel = 'Infectious Proportions';
+h.NodeChildren(3).YDir='normal'; 
 %%
 samples1 = zeros(num_samples,10);
 for s =1:num_samples
@@ -288,7 +294,8 @@ disp(median(samples1(:,9)))
 
                   
 %%
-sv = 0.7:0.01:1;
+figure
+sv = 0.7:0.01:0.99;
 iv = 0.001:0.001:0.01;
 cdata = zeros(length(iv),length(sv));
 t = 5;
@@ -302,11 +309,10 @@ for sidx = 1:length(sv)
     end
 end
 h = heatmap(sv,iv,cdata);
-
-h.Title = 'Day 2 -- Brute Force';
-h.XLabel = 'S';
-h.YLabel = 'I';
-
+h.Title = 'Week 5 -- Brute Force';
+h.XLabel = 'Susceptible Proportions';
+h.YLabel = 'Infectious Proportions';
+h.NodeChildren(3).YDir='normal';   
                   
 %%
 function metric = evaluate_brute_force(T,rs,ri,beta,gamma,costr)
