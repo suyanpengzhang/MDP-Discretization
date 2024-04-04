@@ -9,10 +9,10 @@ file_path = 'covid-data/beta.csv';
 beta = readmatrix(file_path);
 gamma = 0.7048;
 costr = 0.005;
-Greedyres1 = importdata('covid-data/greedy_resconstrained.mat');
-Uniformres1 = importdata('covid-data/uniform_resconstrained.mat');
-Greedyres = importdata('covid-data/greedy_res.mat');
-Uniformres = importdata('covid-data/uniform_res.mat');
+Greedyres = importdata('covid-data/greedy_resconstrained.mat');
+Uniformres = importdata('covid-data/uniform_resconstrained.mat');
+%Greedyres = importdata('covid-data/greedy_res.mat');
+%Uniformres = importdata('covid-data/uniform_res.mat');
 %%
 cdata = zeros(T,5);
 cdata(3:10,1) = 1;
