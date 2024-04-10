@@ -232,7 +232,7 @@ ax.FontSize = 16;
 title({'GreedyCut Discretization'},'Fontsize',18)
 xlabel('Time: week','FontSize',18)
 ylabel('Proportions','FontSize',18)
-legend('Greedy S', 'Greedy I','Greedy R','Actual S','Actual I','Actual R','Fontsize',14)
+legend('GreedyCut S', 'GreedyCut I','GreedyCut R','Actual S','Actual I','Actual R','Fontsize',14)
 %% draw eval algo 2
 transitions0 = importdata('transitions0_greedy_100.mat');
 transitions1 = importdata('transitions1_greedy_100.mat');

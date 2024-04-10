@@ -80,19 +80,79 @@ fill(x1, y1, [1 0.8 0.8]); % Light red
 fill(x2, y2, [0.8 1 0.8]); % Light green
 fill(x3, y3, [0.8 0.8 1]); % Light blue
 fill(x4, y4, [1 1 0.6]); % Light yellow
+plot(0.1,0.3,'*','MarkerSize',10,'LineWidth',2,'Color','black')
+plot(0.3,0.6,'*','MarkerSize',10,'LineWidth',2,'Color','black')
 
 % Add text to each region
+text(0.15, 0.3, '$$\mathbf{X}_t$$', 'HorizontalAlignment', 'center','Interpreter', 'latex', 'fontsize', 18);
+text(0.35, 0.6, '$$\bar{\mathbf{X}}_t$$', 'HorizontalAlignment', 'center','Interpreter', 'latex', 'fontsize', 18);
+
 text(0.3, 0.1, 'State 1', 'HorizontalAlignment', 'center');
-text(0.3, 0.6, 'State 2', 'HorizontalAlignment', 'center');
+text(0.3, 0.5, 'State 2', 'HorizontalAlignment', 'center');
 text(0.8, 0.1, 'State 3', 'HorizontalAlignment', 'center');
-text(0.8, 0.6, 'State 4', 'HorizontalAlignment', 'center');
+text(0.8, 0.5, 'State 4', 'HorizontalAlignment', 'center');
 
 % Set the axis limits
 axis([0 1 0 1]);
 axis square;
 
 % Label the axes
-xlabel('Susceptible, G_S = [0,0.6,1]');
-ylabel('Infectious, G_I = [0,0.2,1]');
+xlabel('Susceptible, G_S = [0,0.6,1]','fontsize', 18);
+ylabel('Infectious, G_I = [0,0.2,1]','fontsize', 18);
+
+hold off;
+%%
+%%
+
+% Define the boundaries of the regions
+x11 = [0 0.3 0.3 0];
+y11 = [0 0 0.2 0.2];
+
+x12 = [0.3 0.6 0.6 0.3];
+y12 = [0 0 0.2 0.2];
+
+x21 = [0 0.3 0.3 0];
+y21 = [0.2 0.2 1 1];
+
+x22 = [0.3 0.6 0.6 0.3];
+y22 = [0.2 0.2 1 1];
+
+x3 = [0.6 1 1 0.6];
+y3 = [0 0 0.2 0.2];
+
+x4 = [0.6 1 1 0.6];
+y4 = [0.2 0.2 1 1];
+
+% Plot the regions with different colors
+figure;
+hold on;
+
+fill(x11, y11, [1 0.8 0.8]); % Light red
+fill(x21, y21, [0.8 1 0.8]); % Light green
+fill(x12, y12, [1 0.6 0.6]); % Light red
+fill(x22, y22, [0.6 1 0.6]); % Light green
+fill(x3, y3, [0.8 0.8 1]); % Light blue
+fill(x4, y4, [1 1 0.6]); % Light yellow
+plot(0.1,0.3,'*','MarkerSize',10,'LineWidth',2,'Color','black')
+plot(0.15,0.6,'*','MarkerSize',10,'LineWidth',2,'Color','black')
+
+% Add text to each region
+text(0.15, 0.3, '$$\mathbf{X}_t$$', 'HorizontalAlignment', 'center','Interpreter', 'latex', 'fontsize', 18);
+text(0.2, 0.6, '$$\bar{\mathbf{X}}_t$$', 'HorizontalAlignment', 'center','Interpreter', 'latex', 'fontsize', 18);
+
+%text(0.15, 0.1, 'State 1', 'HorizontalAlignment', 'center');
+%text(0.15, 0.5, 'State 2', 'HorizontalAlignment', 'center');
+%text(0.45, 0.1, 'State 3', 'HorizontalAlignment', 'center');
+%text(0.45, 0.5, 'State 4', 'HorizontalAlignment', 'center');
+%text(0.8, 0.1, 'State 5', 'HorizontalAlignment', 'center');
+%text(0.8, 0.5, 'State 6', 'HorizontalAlignment', 'center');
+
+% Set the axis limits
+axis([0 1 0 1]);
+axis square;
+
+% Label the axes
+xlabel('Susceptible, G_S'' = [0,0.3,0.6,1]','fontsize', 18);
+ylabel('Infectious, G_I'' = [0,0.2,1]','fontsize', 18);
 
 hold off;

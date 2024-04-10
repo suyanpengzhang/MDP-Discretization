@@ -9,10 +9,10 @@ file_path = 'covid-data/beta.csv';
 beta = readmatrix(file_path);
 gamma = 0.7048;
 costr = 0.005;
-Greedyres = importdata('covid-data/greedy_resconstrained.mat');
-Uniformres = importdata('covid-data/uniform_resconstrained.mat');
-%Greedyres = importdata('covid-data/greedy_res.mat');
-%Uniformres = importdata('covid-data/uniform_res.mat');
+Greedyres1 = importdata('covid-data/greedy_resconstrained.mat');
+Uniformres1 = importdata('covid-data/uniform_resconstrained.mat');
+Greedyres = importdata('covid-data/greedy_res.mat');
+Uniformres = importdata('covid-data/uniform_res.mat');
 %%
 cdata = zeros(T,5);
 cdata(3:10,1) = 1;
@@ -21,7 +21,7 @@ cdata(:,2) = Greedyres(:,4);
 cdata(:,5) = Uniformres1(:,4);
 cdata(:,4) = Greedyres1(:,4);
 cdata = transpose(cdata);
-xvalues = {'Actual','Greedy','Uniform','Greedy -- 2 switch','Uniform -- 2 switch'};
+xvalues = {'Empirical','GreedyCut','Uniform','GreedyCut -- 2 switch','Uniform -- 2 switch'};
 yvalues = cell(1,T);
 yvalues(:,:)={0};
 ytik = cell(1,T);
@@ -157,12 +157,12 @@ plot(time,trj(:,2),'r--', ...
     'LineWidth',3);
 ax = gca;
 ax.FontSize = 16; 
-title({'Proportions of Infectious over Time'},'Fontsize',18)
+title({'Proportion of Population Infectious Over Time'},'Fontsize',18)
 xlabel('Time: week','FontSize',18)
-ylabel('Proportions','FontSize',18)
-legend('Greedy policy', ...
+ylabel('Proportion','FontSize',18)
+legend('GreedyCut policy', ...
     'Uniform policy', ...
-    'Acutal policy', ...
+    'Empirical policy', ...
     'No intervention','Fontsize',14)
 figure
 plot(time,trj(:,1),'r--', ...
@@ -172,15 +172,16 @@ plot(time,trj(:,1),'r--', ...
     'LineWidth',3);
 ax = gca;
 ax.FontSize = 16; 
-title({'Proportions of Susceptible over Time'},'Fontsize',18)
+title({'Proportion of Population Susceptible Over Time'},'Fontsize',18)
 xlabel('Time: week','FontSize',18)
-ylabel('Proportions','FontSize',18)
-legend('Greedy policy', ...
+ylabel('Proportion','FontSize',18)
+legend('GreedyCut policy', ...
     'Uniform policy', ...
-    'Acutal policy', ...
+    'Empirical policy', ...
     'No intervention','Fontsize',14)
 num_infections = zeros(T,4);
 obj = zeros(T,4);
+%costr=0
 for t = 1:T
     obj(t,1)=-trj(t,2)-costr*Greedyres(t,4);
     obj(t,2)=-trj(t,5)-costr*Uniformres(t,4);
@@ -192,13 +193,13 @@ disp('Greedy')
 disp(sum(obj(:,1)))
 disp('Uniform')
 disp(sum(obj(:,2)))
-disp('Actual')
+disp('Empirical')
 disp(sum(obj(:,3)))
 disp('No intervention')
 disp(sum(obj(:,4)))
 figure
-x = categorical({'Greedy' 'Uniform' 'Actual' 'Do nothing'});
-x = reordercats(x,{'Greedy' 'Uniform' 'Actual' 'Do nothing'});
+x = categorical({'GreedyCut' 'Uniform' 'Empirical' 'Do nothing'});
+x = reordercats(x,{'GreedyCut' 'Uniform' 'Empirical' 'Do nothing'});
 bar(x,sum(obj,1))
 text(1:length(sum(obj,1)),sum(obj,1)+0.07,num2str(round(sum(obj,1),4)'),'vert','top','horiz','center','FontSize',16); 
 ylim([0 1]);

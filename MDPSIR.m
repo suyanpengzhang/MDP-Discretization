@@ -308,12 +308,35 @@ for sidx = 1:length(sv)
         cdata(iidx,sidx) = optimal_action(1)-1;
     end
 end
-h = heatmap(sv,iv,cdata);
-h.Title = 'Week 5 -- Brute Force';
-h.XLabel = 'Susceptible Proportions';
-h.YLabel = 'Infectious Proportions';
+%(true,model)
+%(0,0)-0
+%(1,1)-1
+%(0,1)-2
+%(1,0)-3
+vdata = zeros(length(iv),length(sv));
+for sidx = 1:length(sv)
+    for iidx = 1:length(iv)
+        if cdata(iidx,sidx) == 0
+            if cdata_greedy(iidx,sidx) == 0
+                vdata(iidx,sidx) = 0;
+            else
+                vdata(iidx,sidx) = 2;
+            end
+        else
+            if cdata_greedy(iidx,sidx) == 0
+                vdata(iidx,sidx) = 3;
+            else
+                vdata(iidx,sidx) = 1;
+            end
+        end
+    end
+end            
+h = heatmap(sv,iv,vdata,'ColorLimits',[0 3]);
+h.Title = 'Week 5 -- GreedyCut Vs Brute Force';
+h.XLabel = 'Susceptible Proportion';
+h.YLabel = 'Infectious Proportion';
+h.FontSize = 14;
 h.NodeChildren(3).YDir='normal';   
-                  
 %%
 function metric = evaluate_brute_force(T,rs,ri,beta,gamma,costr)
     T = 11-T; 
