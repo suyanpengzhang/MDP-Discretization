@@ -157,7 +157,7 @@ plot(time,trj(:,2),'r--', ...
     'LineWidth',3);
 ax = gca;
 ax.FontSize = 16; 
-title({'Proportion of Population Infectious Over Time'},'Fontsize',18)
+title({'Proportion of the Population Infected Over Time'},'Fontsize',18)
 xlabel('Time: week','FontSize',18)
 ylabel('Proportion','FontSize',18)
 legend('GreedyCut policy', ...
@@ -172,7 +172,7 @@ plot(time,trj(:,1),'r--', ...
     'LineWidth',3);
 ax = gca;
 ax.FontSize = 16; 
-title({'Proportion of Population Susceptible Over Time'},'Fontsize',18)
+title({'Proportion of the Population Susceptible Over Time'},'Fontsize',18)
 xlabel('Time: week','FontSize',18)
 ylabel('Proportion','FontSize',18)
 legend('GreedyCut policy', ...
