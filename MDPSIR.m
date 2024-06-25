@@ -1,17 +1,18 @@
-p0 = importdata('transitions0_greedy_50.mat');
-p1 = importdata('transitions1_greedy_50.mat');
+p0 = importdata('transitions0_smart_400.mat');
+p1 = importdata('transitions1_smart_400.mat');
 %p0 = p0*p0*p0*p0*p0*p0*p0;
 %p1 = p1*p1*p1*p1*p1*p1*p1;
 %p0u = importdata('transitions0_uniform.mat');
 %p1u = importdata('transitions1_uniform.mat');
 %p0u = p0u*p0u*p0u*p0u*p0u*p0p1u = p1u*p1u*p1u*p1u*p1u*p1u*p1u;
-Gs = importdata('Gs_greedy_50.mat');
-Gi = importdata('Gi_greedy_50.mat');
-Gr = importdata('Gr_greedy_50.mat');
-%Gs = 0:0.005:1;
-%Gi = 0:0.002:0.40;
-%Gi(201)=1;
-%Gr = 0:0.005:1;
+%Gs = importdata('Gs_greedy_50.mat');
+%Gi = importdata('Gi_greedy_50.mat');
+%Gr = importdata('Gr_greedy_50.mat');
+Gs = 0:0.0025:1;
+Gi = 0:0.0025:1;
+Gi = 0:0.001:0.40;
+Gi(401)=1;
+Gr = 0:0.0025:1;
 %Gsu = 0:0.005:1;
 %Giu = 0:0.005:1;
 %Gru = 0:0.005:1;
@@ -291,6 +292,100 @@ disp('Mean Opt Gap')
 disp(mean(samples1(:,9)))
 disp('Median Opt Gap')
 disp(median(samples1(:,9)))
+
+%% Lazy Approx
+A = importdata('A_30.mat');
+Vx = importdata('Vx_30.mat');
+
+
+%%
+sv = 0.7:0.01:0.99;
+iv = 0.001:0.001:0.01;
+cdata = zeros(length(iv),length(sv));
+t = 5;
+xxx = 0:0.03333:1;
+for sidx = 1:length(sv)
+    for iidx = 1:length(iv)
+        %disp(sv(sidx))
+        %disp(iv(iidx))
+        vidx = Vx{t}(max(find(xxx<sidx)),max(find(xxx<iidx)));
+        polidx = A{t}(max(find(xxx<sidx)),max(find(xxx<iidx)));
+        cdata(iidx,sidx) = polidx;
+    end
+end
+figure
+h = heatmap(sv,iv,cdata);
+cdata_uniform = cdata;
+h.Title = 'Week 5 -- Uniform';
+h.XLabel = 'Susceptible Proportions';
+h.YLabel = 'Infectious Proportions';
+h.NodeChildren(3).YDir='normal'; 
+%%
+samples2 = zeros(num_samples,10);
+for s =1:num_samples
+    samples2(s,1) = samples(s,1);
+    samples2(s,2) = samples(s,2);
+    samples2(s,3) = samples(s,3);
+    rs = samples2(s,1);
+    ri = samples2(s,2);
+    rr = samples2(s,3);
+    idx = find_index(rs,ri,Gs,Gi);
+    samples2(s,4) = A{1}(max(find(xxx<rs)),max(find(xxx<ri)));
+    samples2(s,5) = Vx{1}(max(find(xxx<rs)),max(find(xxx<ri)));
+    mdp_action = [A{1}(max(find(xxx<rs)),max(find(xxx<ri))),
+        A{2}(max(find(xxx<rs)),max(find(xxx<ri))),
+        A{3}(max(find(xxx<rs)),max(find(xxx<ri))),
+        A{4}(max(find(xxx<rs)),max(find(xxx<ri))),
+        A{5}(max(find(xxx<rs)),max(find(xxx<ri))),
+        A{6}(max(find(xxx<rs)),max(find(xxx<ri))),
+        A{7}(max(find(xxx<rs)),max(find(xxx<ri))),
+        A{8}(max(find(xxx<rs)),max(find(xxx<ri))),
+        A{9}(max(find(xxx<rs)),max(find(xxx<ri))),
+        A{10}(max(find(xxx<rs)),max(find(xxx<ri)))];
+    %disp(optimal_action)
+    %disp(mdp_action)
+    mis_match = 0;
+    for id_find = 1:length(mdp_action)-skip
+        metric = evaluate_brute_force(id_find,rs,ri,beta,gamma,costr);
+        optimal_action = metric(find(metric(:,11) == max(metric(:,11))),1)-1;
+        if mdp_action(id_find) ~= optimal_action(1)
+            mis_match = mis_match + 1;
+        end
+        if id_find == 1
+            samples2(s,7) = max(metric(:,11));
+        end
+    end
+    samples2(s,10) = mis_match;
+    %samples1(s,6) = metric(find(metric(:,11) == max(metric(:,11))),1);
+    %samples1(s,7) = max(metric(:,11));
+    samples2(s,8) = samples2(s,6)-samples2(s,4);
+    s0 = samples2(s,1);
+    i0 = samples2(s,2);
+    r0 = samples2(s,3);
+    cost = 0;
+    for time = 1:10
+        cost = cost -i0;
+        tempA = A{time};
+        if tempA(max(find(xxx<s0)),max(find(xxx<i0)))==1
+            cost = cost -costr;
+        end
+        [s0,i0,r0] = SEIR(s0,i0,r0,beta, gamma,tempA(max(find(xxx<s0)),max(find(xxx<i0))));
+    end
+    samples2(s,9) = abs(cost-samples2(s,7))/abs(samples2(s,7));
+end
+disp('Lazy Approx')
+disp('Accuracy All')
+disp(1-sum(samples2(:,10))/(num_samples*10))
+disp('MSE')
+disp(mean((samples2(:,5)-samples2(:,7)).^2))
+disp('Mean Approx Error')
+disp(mean(abs(samples2(:,5)-samples2(:,7))./(abs(samples2(:,7))))) %approxmiation error
+disp('Median Approx Error')
+disp(median(abs(samples2(:,5)-samples2(:,7))./(abs(samples2(:,7))))) %approxmiation error
+disp('Mean Opt Gap')
+disp(mean(samples2(:,9)))
+disp('Median Opt Gap')
+disp(median(samples2(:,9)))
 
                   
 %%

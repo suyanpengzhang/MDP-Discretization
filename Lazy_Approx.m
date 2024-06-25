@@ -1,55 +1,3 @@
-% Define the time vector
-x = 0:0.01:1;  % Discretize the time range
-
-% Define the piecewise functions
-v = zeros(size(x));
-v(x >= 0 & x < 0.3) = 1;
-v(x >= 0.3 & x < 0.7) = 2;
-v(x >= 0.7 & x <= 1) = 3;
-
-p = zeros(size(x));
-p(x >= 0 & x < 0.3) = 0.1;
-p(x >= 0.3 & x < 0.5) = 0.3;
-p(x >= 0.5 & x < 0.8) = 0.4;
-p(x >= 0.8 & x <= 1) = 0.2;
-
-% Perform the convolution
-conv_result = conv(v, p, 'full') * (x(2) - x(1)); % Normalize by the sampling interval
-
-% Define the time vector for the convolution result
-x_conv = linspace(0, 2*x(end), length(conv_result));
-
-% Find unique points in the convolution result
-threshold = 1e-5; % Small threshold to detect changes
-diffs = abs(diff(diff(conv_result))) > threshold; % Detect changes
-breakpoints = [1, find(diffs) + 1, length(conv_result)]; % Include first and last points
-
-% Extract the unique values
-unique_values = conv_result(breakpoints);
-
-% Display the piecewise linear function
-disp('Breakpoints (t):');
-disp(t_conv(breakpoints));
-disp('Values (conv_result):');
-disp(unique_values);
-
-% Plot the functions and their convolution
-figure;
-hold on;
-plot(x, v, 'DisplayName', 'v(t)');
-plot(x, p, 'DisplayName', 'p(t)');
-plot(x_conv, conv_result, 'DisplayName', '(f * g)(t)');
-for k = 1:length(breakpoints)
-    plot(x_conv(breakpoints(k)), unique_values(k), 'ro', 'MarkerFaceColor', 'r'); % Plot breakpoints
-end
-title('Convolution of Piecewise Constant Functions');
-xlabel('x');
-ylabel('Value');
-legend;
-grid on;
-hold off;
-
-%%
 
 % Define the time vector
 x = 0:0.0001:1;  % Discretize the range for x'
@@ -113,4 +61,105 @@ grid on;
 hold off;
 
 legend;
+
+%%
+
+% Define the 2D grid for x1 and x2
+[x1, x2] = meshgrid(0:0.01:1, 0:0.01:1);  % Create a 2D grid
+
+% Define the piecewise function V(x1, x2)
+x1_dis = [0,0.3,0.7,1];
+x2_dis = [0,0.3,0.7,1];
+V = zeros(size(x1));
+for i=1:length(x1_dis)-1
+    V(x1 >= x1_dis(i) & x1 < x1_dis(i+1) & x2 >= x2_dis(i) & x2 < x2_dis(i+1)) = x1_dis(i);
+end
+
+
+% Define the piecewise function T(x1, x2)
+T = zeros(size(x1));
+T(x1 >= 0 & x1 < 0.3 & x2 >= 0 & x2 < 0.3) = 0.1;
+T(x1 >= 0.3 & x1 < 0.5 & x2 >= 0.3 & x2 < 0.5) = 0.3;
+T(x1 >= 0.5 & x1 < 0.8 & x2 >= 0.5 & x2 < 0.8) = 0.4;
+T(x1 >= 0.8 & x1 <= 1 & x2 >= 0.8 & x2 <= 1) = 0.2;
+
+% Perform the product of T and V over their respective intervals
+product = T .* V;
+
+% Compute the integral result using the trapezoidal rule for 2D
+dx = 0.01;  % Step size in x1 direction
+dy = 0.01;  % Step size in x2 direction
+
+integral_result = sum(product(:)) * dx * dy;  % Numerical integration in 2D
+
+% Display the integral result
+disp(['Integral result: ', num2str(integral_result)]);
+
+%%
+% Define the 2D grid for x1 and x2
+[x1, x2] = meshgrid(0:0.01:1, 0:0.01:1);  % Create a 2D grid
+
+% Define the piecewise function V(x1, x2)
+V = zeros(size(x1));
+x1_dis = [0,0.3,0.7,1];
+x2_dis = [0,0.3,0.7,1];
+V = zeros(size(x1));
+for i=1:length(x1_dis)-1
+    if i<length(x1_dis)-1
+        V(x1 >= x1_dis(i) & x1 < x1_dis(i+1) & x2 >= x2_dis(i) & x2 < x2_dis(i+1)) = x1_dis(i);
+    else
+        V(x1 >= x1_dis(i) & x1 <= x1_dis(i+1) & x2 >= x2_dis(i) & x2 <= x2_dis(i+1)) = x1_dis(i);
+    end
+
+end
+
+% Define the piecewise function T(x1, x2)
+T = zeros(size(x1));
+T(x1 >= 0 & x1 < 0.3 & x2 >= 0 & x2 < 0.3) = 0.1;
+T(x1 >= 0.3 & x1 < 0.5 & x2 >= 0.3 & x2 < 0.5) = 0.3;
+T(x1 >= 0.5 & x1 < 0.8 & x2 >= 0.5 & x2 < 0.8) = 0.4;
+T(x1 >= 0.8 & x1 <= 1 & x2 >= 0.8 & x2 <= 1) = 0.2;
+
+% Visualization using surf
+figure;
+surf(x1, x2, V);
+title('Piecewise Function V(x1, x2)');
+xlabel('x1');
+ylabel('x2');
+zlabel('V');
+colorbar;
+
+% Visualization using imagesc
+figure;
+imagesc([0 1], [0 1], V); % specify the x and y range
+set(gca, 'YDir', 'normal'); % set Y direction to normal
+title('Piecewise Function V(x1, x2)');
+xlabel('x1');
+ylabel('x2');
+colorbar;
+axis equal tight;
+
+% Visualization of the product T .* V
+product = T .* V;
+
+% Visualization using surf
+figure;
+surf(x1, x2, product);
+title('Product of T(x1, x2) and V(x1, x2)');
+xlabel('x1');
+ylabel('x2');
+zlabel('Product');
+colorbar;
+
+% Visualization using imagesc
+figure;
+imagesc([0 1], [0 1], product); % specify the x and y range
+set(gca, 'YDir', 'normal'); % set Y direction to normal
+title('Product of T(x1, x2) and V(x1, x2)');
+xlabel('x1');
+ylabel('x2');
+colorbar;
+axis equal tight;
+
+
 
