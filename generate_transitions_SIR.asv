@@ -1,11 +1,11 @@
-Gs = importdata('Gs_greedy_100.mat');
-Gi = importdata('Gi_greedy_100.mat');
-Gr = importdata('Gr_greedy_100.mat');
-Gs = 0:0.0025:1;
-Gi = 0:0.0025:1;
-Gi = 0:0.001:0.40;
-Gi(401)=1;
-Gr = 0:0.0025:1;
+Gs = importdata('Gs_density_400.mat');
+Gi = importdata('Gi_density_400.mat');
+Gr = importdata('Gr_density_400.mat');
+%Gs = 0:0.0025:1;
+%Gi = 0:0.0025:1;
+%Gi = 0:0.001:0.40;
+%Gi(401)=1;
+%Gr = 0:0.0025:1;
 %%
 lgs = length(Gs)-1;
 lgi = length(Gi)-1;

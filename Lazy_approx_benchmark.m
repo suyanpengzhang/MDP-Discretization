@@ -1,10 +1,10 @@
 %%
 % Define the 2D grid for x1 and x2
-[x1, x2] = meshgrid(0:0.03333:1, 0:0.03333:1);  % Create a 2D grid
-xxx = 0:0.03333:1;
-Gs = 0:0.03333:1;
-Gi = 0:0.03333:1;
-Gr = 0:0.03333:1;
+[x1, x2] = meshgrid(0:0.0025:1, 0:0.0025:1);  % Create a 2D grid
+xxx = 0:0.0025:1;
+Gs = 0:0.0025:1;
+Gi = 0:0.0025:1;
+Gr = 0:0.0025:1;
 V_N = zeros(size(x1));
 for i=1:size(x1,1)-1
     for j=1:size(x1,1)-1
@@ -35,8 +35,8 @@ ylabel('i');
 colorbar;
 axis equal tight;
 
-p0 = importdata('transitions0_uniform_30.mat');
-p1 = importdata('transitions1_uniform_30.mat');
+p0 = importdata('transitions0_uniform_400.mat');
+p1 = importdata('transitions1_uniform_400.mat');
 
 
 
@@ -65,8 +65,10 @@ axis equal tight;
 V_10 = zeros(size(x1));
 A_10 = zeros(size(x1));
 for t=1:10
+    disp('T')
     disp(t)
     for i=1:size(x1,1)-1
+        disp(i)
         for j=1:size(x1,1)-1
             if i<size(x1,1)-1
                 if j<size(x1,1)-1
@@ -185,10 +187,28 @@ function [t0,t1] = compute_transition_vec(ss,ii,Gs,Gi,x1,x2,p0,p1)
     idx_0 = find_index(ss,ii,Gs,Gi);
     for i=2:length(Gs)
         for j=2:length(Gi)
-            t0(x1 > Gs(i-1) & x1 <= Gs(i) & x2 > Gi(j-1) & x2 <= Gi(j)) = p0(idx_0,find_index((Gs(i)+Gs(i-1))/2,(Gi(j)+Gi(j-1))/2,Gs,Gi));
-            t1(x1 > Gs(i-1) & x1 <= Gs(i) & x2 > Gi(j-1) & x2 <= Gi(j)) = p1(idx_0,find_index((Gs(i)+Gs(i-1))/2,(Gi(j)+Gi(j-1))/2,Gs,Gi));
+            if i>0
+                if j>0
+                    t0(x1 > Gs(i-1) & x1 <= Gs(i) & x2 > Gi(j-1) & x2 <= Gi(j)) = p0(idx_0,find_index((Gs(i)+Gs(i-1))/2,(Gi(j)+Gi(j-1))/2,Gs,Gi));
+                    t1(x1 > Gs(i-1) & x1 <= Gs(i) & x2 > Gi(j-1) & x2 <= Gi(j)) = p1(idx_0,find_index((Gs(i)+Gs(i-1))/2,(Gi(j)+Gi(j-1))/2,Gs,Gi));
+                else
+                    t0(x1 > Gs(i-1) & x1 <= Gs(i) & x2 >= Gi(j-1) & x2 <= Gi(j)) = p0(idx_0,find_index((Gs(i)+Gs(i-1))/2,(Gi(j)+Gi(j-1))/2,Gs,Gi));
+                    t1(x1 > Gs(i-1) & x1 <= Gs(i) & x2 >= Gi(j-1) & x2 <= Gi(j)) = p1(idx_0,find_index((Gs(i)+Gs(i-1))/2,(Gi(j)+Gi(j-1))/2,Gs,Gi));
+                end
+            else
+                if j>0
+                    t0(x1 >= Gs(i-1) & x1 <= Gs(i) & x2 > Gi(j-1) & x2 <= Gi(j)) = p0(idx_0,find_index((Gs(i)+Gs(i-1))/2,(Gi(j)+Gi(j-1))/2,Gs,Gi));
+                    t1(x1 >= Gs(i-1) & x1 <= Gs(i) & x2 > Gi(j-1) & x2 <= Gi(j)) = p1(idx_0,find_index((Gs(i)+Gs(i-1))/2,(Gi(j)+Gi(j-1))/2,Gs,Gi));
+                else
+                    t0(x1 >= Gs(i-1) & x1 <= Gs(i) & x2 >= Gi(j-1) & x2 <= Gi(j)) = p0(idx_0,find_index((Gs(i)+Gs(i-1))/2,(Gi(j)+Gi(j-1))/2,Gs,Gi));
+                    t1(x1 >= Gs(i-1) & x1 <= Gs(i) & x2 >= Gi(j-1) & x2 <= Gi(j)) = p1(idx_0,find_index((Gs(i)+Gs(i-1))/2,(Gi(j)+Gi(j-1))/2,Gs,Gi));
+                end
+            end
         end
     end
+    t0 = t0./sum(t0,'all');
+    t1 = t1./sum(t1,'all');
+
 end
 
 function [s,i,r] = reverse_find_index(idx,Gs,Gi)
