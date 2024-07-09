@@ -20,7 +20,7 @@ end
 %}
 %% compute error (compare with true)
 % Define the file names
-t_score = tinv(0.975, 99);
+t_score = tinv(0.975, 999);
 T = 20;
 beta = 0.2*7;
 theta = 0.25*7;
@@ -34,6 +34,11 @@ files_Gi = {'Gi_greedy_30.mat', 'Gi_greedy_50.mat', 'Gi_greedy_100.mat','Gi_gree
 files_Gr = {'Gr_greedy_30.mat', 'Gr_greedy_50.mat', 'Gr_greedy_100.mat','Gr_greedy_400_new.mat'};
 files_trans0_g = {'transitions0_greedy_30.mat', 'transitions0_greedy_50.mat', 'transitions0_greedy_100.mat','transition0_greedy_400_new.mat'};
 files_trans1_g = {'transitions1_greedy_30.mat', 'transitions1_greedy_50.mat', 'transitions1_greedy_100.mat','transition1_greedy_400_new.mat'};
+files_Gsd = {'Gs_density_30.mat', 'Gs_density_50.mat', 'Gs_density_100.mat','Gs_density_400.mat'};
+files_Gid = {'Gi_density_30.mat', 'Gi_density_50.mat', 'Gi_density_100.mat','Gi_density_400.mat'};
+files_Grd = {'Gr_density_30.mat', 'Gr_density_50.mat', 'Gr_density_100.mat','Gr_density_400.mat'};
+files_trans0_d = {'transitions0_density_30.mat', 'transitions0_density_50.mat', 'transitions0_density_100.mat','transitions0_density_400.mat'};
+files_trans1_d = {'transitions1_density_30.mat', 'transitions1_density_50.mat', 'transitions1_density_100.mat','transitions1_density_400.mat'};
 files_trans0_u = {'transitions0_uniform_30.mat', 'transitions0_uniform_50.mat', 'transitions0_uniform_100.mat','transitions0_uniform_400.mat'};
 files_trans1_u = {'transitions1_uniform_30.mat', 'transitions1_uniform_50.mat', 'transitions1_uniform_100.mat','transitions1_uniform_400.mat'};
 % Loop to load the files
@@ -41,8 +46,11 @@ Greedy_error = zeros(1,4);
 Greedy_error_dis = zeros(1,4);
 Uniform_error = zeros(1,4);
 Uniform_error_dis = zeros(1,4);
+Density_error = zeros(1,4);
+Density_error_dis = zeros(1,4);
 num_samples = 1000;
-for ifl = 4:numel(files_Gs)
+for ifl = 1:numel(files_Gs)
+    disp(ifl)
     file_name = files_Gs{ifl};
     Gs = importdata(file_name);
     file_name = files_Gi{ifl};
@@ -54,7 +62,6 @@ for ifl = 4:numel(files_Gs)
     file_name = files_trans1_g{ifl};
     transitions1 = importdata(file_name);
     disp('**********')
-    disp(ifl)
     lgs = length(Gs)-1;
     lgi = length(Gi)-1;
     errors = zeros(num_samples,1);
@@ -140,6 +147,104 @@ for ifl = 4:numel(files_Gs)
     disp('Greedy CI')
     disp(ci_low)
     disp(ci_high)
+
+    file_name = files_Gsd{ifl};
+    Gs = importdata(file_name);
+    file_name = files_Gid{ifl};
+    Gi = importdata(file_name);
+    file_name = files_Grd{ifl};
+    Gr = importdata(file_name);
+    file_name = files_trans0_d{ifl};
+    transitions0 = importdata(file_name);
+    file_name = files_trans1_d{ifl};
+    transitions1 = importdata(file_name);
+    disp('**********')
+    lgs = length(Gs)-1;
+    lgi = length(Gi)-1;
+    errors = zeros(num_samples,1);
+    errors_dis = zeros(num_samples,1);
+    for iiii = 1:num_samples
+        %disp(iiii)
+        pol = policy_eval(iiii,:);
+        s0 = samples_eval(iiii,1);
+        i0 = samples_eval(iiii,2);
+        r0 = samples_eval(iiii,3);
+        trj_s = zeros(1,T);
+        trj_i = zeros(1,T);
+        trj_r = zeros(1,T);
+        idx0 = find_index(s0,i0,Gs,Gi);
+        b0 = sparse(1,lgs*lgi);
+        b0(1,idx0) = 1;
+        T = 10;
+        for t = 1:T
+            if pol(t)==0
+                b0 = b0*transitions0;
+            else
+                b0 = b0*transitions1;
+            end
+            nonzeros_idx = find(b0);
+            values = nonzeros(b0);
+            ss = 0;
+            ii = 0;
+            rr = 0;
+            for k = 1:length(nonzeros_idx)
+                [s,i,r] = reverse_find_index(nonzeros_idx(k),Gs,Gi);
+                if r<0
+                    s = s/(s+i);
+                    i = i/(s+i);
+                    r = 0;
+                end
+                ss = ss + b0(1,nonzeros_idx(k))*(s);
+                ii = ii + b0(1,nonzeros_idx(k))*(i);
+                rr = rr + b0(1,nonzeros_idx(k))*(r);
+            end
+            trj_s(1,t) = ss;
+            trj_i(1,t) = ii;
+            trj_r(1,t) = rr;
+        end
+        [S,I,R] = SEIR_trj_dis(s0,i0,r0,beta,gamma,T,pol,Gs,Gi,Gr);
+        err = 0;
+        for t =1:T
+            err = err + (S(t)-trj_s(t))^2;
+            err = err + (I(t)-trj_i(t))^2;
+            err = err + (R(t)-trj_r(t))^2;
+        end
+        errors_dis(iiii,1) = err;
+        [S,I,R] = SEIR_trj(s0,i0,r0,beta,gamma,T,pol);
+        err = 0;
+        for t =1:T
+            err = err + (S(t)-trj_s(t))^2;
+            err = err + (I(t)-trj_i(t))^2;
+            err = err + (R(t)-trj_r(t))^2;
+        end
+        errors(iiii,1) = err;
+        %{
+        if ifl>2
+            figure
+            trj_d = zeros(T,6);
+            trj_d(:,1) = S;
+            trj_d(:,2) = I;
+            trj_d(:,3) = R;
+            trj_d(:,4) = trj_s;
+            trj_d(:,5) = trj_i;
+            trj_d(:,6) = trj_r;
+            plot(trj_d)
+        end
+        %}
+    end
+    Density_error_dis(1,ifl) = mean(errors_dis);
+    Density_error(1,ifl) = mean(errors);
+    ci_dis_low = mean(errors_dis)-(std(errors_dis) / sqrt(100))*t_score;
+    ci_dis_high = mean(errors_dis)+(std(errors_dis) / sqrt(100))*t_score;
+    disp('Density_dis CI')
+    disp(ci_dis_low)
+    disp(ci_dis_high)
+    ci_low = mean(errors)-(std(errors) / sqrt(100))*t_score;
+    ci_high = mean(errors)+(std(errors) / sqrt(100))*t_score;
+    disp('Density CI')
+    disp(ci_low)
+    disp(ci_high)
+    
     if ifl ==1 
         Gs = 0:0.03333:1;
         Gi= 0:0.03333:1;
@@ -162,7 +267,7 @@ for ifl = 4:numel(files_Gs)
     file_name = files_trans1_u{ifl};
     transitions1 = importdata(file_name);
     disp('**********')
-    disp(ifl)
+    %disp(ifl)
     lgs = length(Gs)-1;
     lgi = length(Gi)-1;
     errors = zeros(num_samples,1);
@@ -234,6 +339,7 @@ for ifl = 4:numel(files_Gs)
     disp('Uniform CI')
     disp(ci_low)
     disp(ci_high)
+   
 end
 
 

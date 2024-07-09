@@ -1,13 +1,13 @@
-p0 = importdata('transitions0_greedy_100.mat');
-p1 = importdata('transitions1_greedy_100.mat');
+p0 = importdata('transitions0_density_100.mat');
+p1 = importdata('transitions1_density_100.mat');
 %p0 = p0*p0*p0*p0*p0*p0*p0;
 %p1 = p1*p1*p1*p1*p1*p1*p1;
 %p0u = importdata('transitions0_uniform.mat');
 %p1u = importdata('transitions1_uniform.mat');
 %p0u = p0u*p0u*p0u*p0u*p0u*p0p1u = p1u*p1u*p1u*p1u*p1u*p1u*p1u;
-Gs = importdata('Gs_greedy_100.mat');
-Gi = importdata('Gi_greedy_100.mat');
-Gr = importdata('Gr_greedy_100.mat');
+Gs = importdata('Gs_density_100.mat');
+Gi = importdata('Gi_density_100.mat');
+Gr = importdata('Gr_density_100.mat');
 %Gs = 0:0.0025:1;
 %Gi = 0:0.0025:1;
 %Gi = 0:0.001:0.40;
@@ -427,7 +427,7 @@ for sidx = 1:length(sv)
     end
 end            
 h = heatmap(sv,iv,vdata,'ColorLimits',[0 3]);
-h.Title = 'Week 5 -- GreedyCut Vs Brute Force';
+h.Title = 'Week 5 -- Simulation-Based Vs Brute Force';
 h.XLabel = 'Susceptible Proportion';
 h.YLabel = 'Infectious Proportion';
 h.FontSize = 14;

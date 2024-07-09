@@ -1,6 +1,6 @@
-Gs = importdata('covid-data/COVIDGs_Greedy_200.mat');
-Gi = importdata('covid-data/COVIDGi_Greedy_200.mat');
-Gr = importdata('covid-data/COVIDGr_Greedy_200.mat');
+Gs = importdata('covid-data/Gs_density_50_COVID.mat');
+Gi = importdata('covid-data/Gi_density_50_COVID.mat');
+Gr = importdata('covid-data/Gr_density_50_COVID.mat');
 %Gs = 0:0.02:1;
 %Gi = 0:0.02:1;
 %Gi(51)=1;

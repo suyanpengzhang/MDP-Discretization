@@ -160,6 +160,19 @@ disp('finished')
 
 
 %% Draw trajectory eval algo 1
+Gs = importdata('Gs_greedy_100.mat');
+Gi = importdata('Gi_greedy_100.mat');
+Gr = importdata('Gr_greedy_100.mat');
+
+lgs = length(Gs)-1;
+lgi = length(Gi)-1;
+beta = 0.2*7;
+theta = 0.25*7;
+gamma = 0.07*7;
+
+s0 = 0.99;
+i0 = 0.001;
+r0 = 1-s0-i0;
 transitions0 = importdata('transitions0_greedy_100.mat');
 transitions1 = importdata('transitions1_greedy_100.mat');
 T=10;
@@ -229,10 +242,10 @@ plot(time,trj1(:,1),'r', ...
     time,trj1(:,6),'b--','LineWidth',3);
 ax = gca;
 ax.FontSize = 16; 
-title({'GreedyCut Discretization'},'Fontsize',18)
+title({'Simulation-Based Discretization'},'Fontsize',18)
 xlabel('Time: week','FontSize',18)
 ylabel('Proportions','FontSize',18)
-legend('GreedyCut S', 'GreedyCut I','GreedyCut R','Actual S','Actual I','Actual R','Fontsize',14)
+legend('Simulation-Based S', 'Simulation-Based I','Simulation-Based R','Actual S','Actual I','Actual R','Fontsize',14)
 %% draw eval algo 2
 transitions0 = importdata('transitions0_greedy_100.mat');
 transitions1 = importdata('transitions1_greedy_100.mat');
@@ -309,7 +322,7 @@ xlabel('Time: week','FontSize',18)
 ylabel('Proportions','FontSize',18)
 legend('Markovian S', 'Markovian I','Markovian R','Discretized S','Discretized I','Discretized R','Fontsize',14)
 %%
-%{
+
 errors = zeros(10,1);
 for iiii = 1:10
     disp(ii)
