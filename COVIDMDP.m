@@ -13,6 +13,12 @@ Gr = importdata('covid-data/Gr_density_50_COVID.mat');
 %Gs = 0:0.02:1;
 %Gi = 0:0.02:1;
 %Gr = 0:0.02:1;
+p0 = importdata('covid-data/COVIDtransitions0_smart_50.mat');
+p1 = importdata('covid-data/COVIDtransitions1_smart_50.mat');
+Gs = 0:0.02:1;
+Gi = 0:0.008:0.4;
+Gi(51)=1;
+Gr = 0:0.02:1;
 T=60;
 file_path = 'covid-data/beta.csv';
 % Load the CSV file into a MATLAB array

@@ -13,6 +13,12 @@ Gr = importdata('covid-data/Gr_density_50_COVID.mat');
 %Gs = 0:0.02:1;
 %Gi = 0:0.02:1;
 %Gr = 0:0.02:1;
+p0 = importdata('covid-data/COVIDtransitions0_smart_50.mat');
+p1 = importdata('covid-data/COVIDtransitions1_smart_50.mat');
+Gs = 0:0.02:1;
+Gi = 0:0.008:0.4;
+Gi(51)=1;
+Gr = 0:0.02:1;
 lgs = length(Gs)-1;
 lgi = length(Gi)-1;
 %in the order of historical action 00,01,10,11

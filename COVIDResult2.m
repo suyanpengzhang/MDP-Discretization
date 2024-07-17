@@ -12,20 +12,25 @@ costr = 0.005;
 Greedyres1 = importdata('covid-data/greedy_resconstrained.mat');
 Densityres1 = importdata('covid-data/density_resconstrained.mat');
 Uniformres1 = importdata('covid-data/uniform_resconstrained.mat');
+Smartres1 = importdata('covid-data/smart_resconstrained.mat');
+
 Greedyres = importdata('covid-data/greedy_res.mat');
 Uniformres = importdata('covid-data/uniform_res.mat');
 Densityres = importdata('covid-data/density_res.mat');
+Smartres = importdata('covid-data/smart_res.mat');
 %%
-cdata = zeros(T,7);
+cdata = zeros(T,9);
 cdata(3:10,1) = 1;
 cdata(:,3) = Densityres(:,4);
-cdata(:,4) = Uniformres(:,4);
+cdata(:,4) = Smartres(:,4);
+cdata(:,5) = Uniformres(:,4);
 cdata(:,2) = Greedyres(:,4);
-cdata(:,7) = Uniformres1(:,4);
-cdata(:,6) = Densityres1(:,4);
-cdata(:,5) = Greedyres1(:,4);
+cdata(:,9) = Uniformres1(:,4);
+cdata(:,8) = Smartres1(:,4);
+cdata(:,7) = Densityres1(:,4);
+cdata(:,6) = Greedyres1(:,4);
 cdata = transpose(cdata);
-xvalues = {'Empirical','GreedyCut','Simulation-Based','Uniform','GreedyCut -- 2 switch','Simulation-Based -- 2 switch','Uniform -- 2 switch'};
+xvalues = {'Empirical','GreedyCut','InverseProportional','Expert','Uniform','GreedyCut -- 2 switch','InverseProportional -- 2 switch','Expert -- 2 switch','Uniform -- 2 switch'};
 yvalues = cell(1,T);
 yvalues(:,:)={0};
 ytik = cell(1,T);
@@ -102,17 +107,20 @@ S0 = s0;
 Sg = s0;
 Su = s0;
 Sd = s0;
+Ss = s0;
 I = i0;
 I0 = i0;
 Ig = i0;
 Iu = i0;
 Id = i0;
+Is = i0;
 R = r0;
 Rg = r0;
 Ru = r0;
 R0 = r0;
 Rd = r0;
-trj = zeros(T,15);
+Rs = r0;
+trj = zeros(T,18);
 for t = 1:T
     disp(t)
     %[S,I,R] = SEIR(S*ones(26,1),I*ones(26,1),R*ones(26,1),beta,gamma,pol(t));
@@ -128,6 +136,7 @@ for t = 1:T
     [Sg,Ig,Rg] = SEIR(Sg,Ig,Rg,beta,gamma,Greedyres(t,4));
     [Su,Iu,Ru] = SEIR(Su,Iu,Ru,beta,gamma,Uniformres(t,4));
     [Sd,Id,Rd] = SEIR(Sd,Id,Rd,beta,gamma,Densityres(t,4));
+    [Ss,Is,Rs] = SEIR(Ss,Is,Rs,beta,gamma,Smartres(t,4));
     %trj(t,1) = Sg;
     %trj(t,2) = Ig;
     %trj(t,3) = Rg;
@@ -160,10 +169,15 @@ for t = 1:T
     trj(t,13) = x;
     trj(t,14) = y;
     trj(t,15) = z;
+    [x,y,z] = compute_total_SIR(Ss,Is,Rs);
+    trj(t,16) = x;
+    trj(t,17) = y;
+    trj(t,18) = z;
 end
 figure
 plot(time,trj(:,2),'r--', ...
     time,trj(:,14),'m-', ...
+    time,trj(:,17),'c-', ...
     time,trj(:,5),'b', ...
     time,trj(:,8),'g:', ...
     time,trj(:,11),'k-.', ...
@@ -174,13 +188,15 @@ title({'Proportion of the Population Infected Over Time'},'Fontsize',18)
 xlabel('Time: week','FontSize',18)
 ylabel('Proportion','FontSize',18)
 legend('GreedyCut policy', ...
-    'Simluation-Based policy', ...
+    'InverseProportional policy', ...
+    'Expert policy', ...
     'Uniform policy', ...
     'Empirical policy', ...
     'No intervention','Fontsize',14)
 figure
 plot(time,trj(:,1),'r--', ...
     time,trj(:,13),'m-', ...
+    time,trj(:,16),'c-', ...
     time,trj(:,4),'b', ...
     time,trj(:,7),'g:', ...
     time,trj(:,10),'k-.', ...
@@ -191,34 +207,38 @@ title({'Proportion of the Population Susceptible Over Time'},'Fontsize',18)
 xlabel('Time: week','FontSize',18)
 ylabel('Proportion','FontSize',18)
 legend('GreedyCut policy', ...
-    'Simluation-Based policy', ...
+    'InverseProportional policy', ...
+    'Expert policy', ...
     'Uniform policy', ...
     'Empirical policy', ...
     'No intervention','Fontsize',14)
 num_infections = zeros(T,5);
-obj = zeros(T,5);
+obj = zeros(T,6);
 %costr=0
 for t = 1:T
     obj(t,1)=-trj(t,2)-costr*Greedyres(t,4);
-    obj(t,3)=-trj(t,5)-costr*Uniformres(t,4);
-    obj(t,4)=-trj(t,8)-costr*pol(t,1);
-    obj(t,5)=-trj(t,11)-costr*pol0(t,1);
+    obj(t,4)=-trj(t,5)-costr*Uniformres(t,4);
+    obj(t,5)=-trj(t,8)-costr*pol(t,1);
+    obj(t,6)=-trj(t,11)-costr*pol0(t,1);
     obj(t,2)=-trj(t,14)-costr*Densityres(t,4);
+    obj(t,3)=-trj(t,14)-costr*Smartres(t,4);
 end
 obj = -obj;
 disp('Greedy')
 disp(sum(obj(:,1)))
-disp('Simulation-Based')
+disp('InverseProportional')
 disp(sum(obj(:,2)))
-disp('Uniform')
+disp('Expert')
 disp(sum(obj(:,3)))
-disp('Empirical')
+disp('Uniform')
 disp(sum(obj(:,4)))
-disp('No intervention')
+disp('Empirical')
 disp(sum(obj(:,5)))
+disp('No intervention')
+disp(sum(obj(:,6)))
 figure
-x = categorical({'GreedyCut' 'Simulation-Based' 'Uniform' 'Empirical' 'Do nothing'});
-x = reordercats(x,{'GreedyCut' 'Simulation-Based' 'Uniform' 'Empirical' 'Do nothing'});
+x = categorical({'GreedyCut' 'InverseProportional' 'Expert' 'Uniform' 'Empirical' 'Do nothing'});
+x = reordercats(x,{'GreedyCut' 'InverseProportional' 'Expert' 'Uniform' 'Empirical' 'Do nothing'});
 bar(x,sum(obj,1))
 text(1:length(sum(obj,1)),sum(obj,1)+0.07,num2str(round(sum(obj,1),4)'),'vert','top','horiz','center','FontSize',16); 
 ylim([0 1]);

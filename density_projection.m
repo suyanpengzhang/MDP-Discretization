@@ -3,12 +3,15 @@ T = 20; %Time epoch
 beta = 0.2*7; %initial parameter
 theta = 0.25*7;
 gamma = 0.07*7;
-Ssample =zeros(1000,20);
-Isample = zeros(1000,20);
-Rsample = zeros(1000,20);
-for c=1:1000
-    s0 = 0.7+0.3*rand();
-    i0 = 0.001+0.099*rand();
+samples = importdata('samples_for_compare.mat');
+pol_samples = importdata('policy_for_compare.mat');
+N = 120;
+Ssample =zeros(N,20);
+Isample = zeros(N,20);
+Rsample = zeros(N,20);
+for c=1:N
+    s0= samples(c,1);
+    i0 = samples(c,2);
     if s0+i0>=1
         s0 = s0/(s0+i0);
         i0 = i0/(s0+i0);
@@ -16,32 +19,32 @@ for c=1:1000
     else
         r0 = 1-s0-i0;
     end
-    pol = randi(2,T,1)-1; %policy
+    pol = pol_samples(c,1:T); %policy
     [S,I,R] = SEIR_trj(s0,i0,r0,beta, gamma,T,pol);
     Ssample(c,:)=S;
     Isample(c,:)=I;
     Rsample(c,:)=R;
 end
 %%
-Nc = 400;
-Isample=reshape(Isample,20000,1);
-Ssample=reshape(Ssample,20000,1);
-Rsample=reshape(Rsample,20000,1);
-int1s = Nc*(length(Ssample(Ssample<0.2))/20000);
-int2s = Nc*(length(Ssample(Ssample<0.4 &Ssample>=0.2))/20000);
-int3s = Nc*(length(Ssample(Ssample<0.6 &Ssample>=0.4))/20000);
-int4s = Nc*(length(Ssample(Ssample<0.8 &Ssample>=0.6))/20000);
-int5s = Nc*(length(Ssample(Ssample<=1 &Ssample>=0.8))/20000);
-int1i = Nc*(length(Isample(Isample<0.2))/20000);
-int2i = Nc*(length(Isample(Isample<0.4 &Isample>=0.2))/20000);
-int3i = Nc*(length(Isample(Isample<0.6 &Isample>=0.4))/20000);
-int4i = Nc*(length(Isample(Isample<0.8 &Isample>=0.6))/20000);
-int5i = Nc*(length(Isample(Isample<=1 &Isample>=0.8))/20000);
-int1r = Nc*(length(Rsample(Rsample<0.2))/20000);
-int2r = Nc*(length(Rsample(Rsample<0.4 &Rsample>=0.2))/20000);
-int3r = Nc*(length(Rsample(Rsample<0.6 &Rsample>=0.4))/20000);
-int4r = Nc*(length(Rsample(Rsample<0.8 &Rsample>=0.6))/20000);
-int5r = Nc*(length(Rsample(Rsample<=1 &Rsample>=0.8))/20000);
+Nc = 400-4;
+Isample=reshape(Isample,N*T,1);
+Ssample=reshape(Ssample,N*T,1);
+Rsample=reshape(Rsample,N*T,1);
+int1s = Nc*(length(Ssample(Ssample<0.2))/(N*T));
+int2s = Nc*(length(Ssample(Ssample<0.4 &Ssample>=0.2))/(N*T));
+int3s = Nc*(length(Ssample(Ssample<0.6 &Ssample>=0.4))/(N*T));
+int4s = Nc*(length(Ssample(Ssample<0.8 &Ssample>=0.6))/(N*T));
+int5s = Nc*(length(Ssample(Ssample<=1 &Ssample>=0.8))/(N*T));
+int1i = Nc*(length(Isample(Isample<0.2))/(N*T));
+int2i = Nc*(length(Isample(Isample<0.4 &Isample>=0.2))/(N*T));
+int3i = Nc*(length(Isample(Isample<0.6 &Isample>=0.4))/(N*T));
+int4i = Nc*(length(Isample(Isample<0.8 &Isample>=0.6))/(N*T));
+int5i = Nc*(length(Isample(Isample<=1 &Isample>=0.8))/(N*T));
+int1r = Nc*(length(Rsample(Rsample<0.2))/(N*T));
+int2r = Nc*(length(Rsample(Rsample<0.4 &Rsample>=0.2))/(N*T));
+int3r = Nc*(length(Rsample(Rsample<0.6 &Rsample>=0.4))/(N*T));
+int4r = Nc*(length(Rsample(Rsample<0.8 &Rsample>=0.6))/(N*T));
+int5r = Nc*(length(Rsample(Rsample<=1 &Rsample>=0.8))/(N*T));
 
 Gs1 = 0:0.2/int1s:0.2;
 Gs2 = 0.2:0.2/int2s:0.4;

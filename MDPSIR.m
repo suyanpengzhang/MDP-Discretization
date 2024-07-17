@@ -1,18 +1,18 @@
-p0 = importdata('transitions0_density_100.mat');
-p1 = importdata('transitions1_density_100.mat');
+p0 = importdata('transitions0_smart_30.mat');
+p1 = importdata('transitions1_smart_30.mat');
 %p0 = p0*p0*p0*p0*p0*p0*p0;
 %p1 = p1*p1*p1*p1*p1*p1*p1;
 %p0u = importdata('transitions0_uniform.mat');
 %p1u = importdata('transitions1_uniform.mat');
 %p0u = p0u*p0u*p0u*p0u*p0u*p0p1u = p1u*p1u*p1u*p1u*p1u*p1u*p1u;
-Gs = importdata('Gs_density_100.mat');
-Gi = importdata('Gi_density_100.mat');
-Gr = importdata('Gr_density_100.mat');
-%Gs = 0:0.0025:1;
+Gs = importdata('Gs_density_30_new.mat');
+Gi = importdata('Gi_density_30_new.mat');
+Gr = importdata('Gr_density_30_new.mat');
+Gs = 0:0.03333:1;
 %Gi = 0:0.0025:1;
-%Gi = 0:0.001:0.40;
-%Gi(401)=1;
-%Gr = 0:0.0025:1;
+Gi = 0:0.013333:0.40;
+Gi(31)=1;
+Gr = 0:0.03333:1;
 %Gsu = 0:0.005:1;
 %Giu = 0:0.005:1;
 %Gru = 0:0.005:1;
@@ -427,7 +427,7 @@ for sidx = 1:length(sv)
     end
 end            
 h = heatmap(sv,iv,vdata,'ColorLimits',[0 3]);
-h.Title = 'Week 5 -- Simulation-Based Vs Brute Force';
+h.Title = 'Week 5 -- Expert Vs Brute Force';
 h.XLabel = 'Susceptible Proportion';
 h.YLabel = 'Infectious Proportion';
 h.FontSize = 14;

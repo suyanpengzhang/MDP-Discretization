@@ -1,6 +1,6 @@
-Gs = importdata('Gs_density_400.mat');
-Gi = importdata('Gi_density_400.mat');
-Gr = importdata('Gr_density_400.mat');
+Gs = importdata('Gs_density_400_new.mat');
+Gi = importdata('Gi_density_400_new.mat');
+Gr = importdata('Gr_density_400_new.mat');
 %Gs = 0:0.0025:1;
 %Gi = 0:0.0025:1;
 %Gi = 0:0.001:0.40;
@@ -160,9 +160,16 @@ disp('finished')
 
 
 %% Draw trajectory eval algo 1
+Gs = importdata('Gs_density_100_new.mat');
+Gi = importdata('Gi_density_100_new.mat');
+Gr = importdata('Gr_density_100_new.mat');
 Gs = importdata('Gs_greedy_100.mat');
 Gi = importdata('Gi_greedy_100.mat');
 Gr = importdata('Gr_greedy_100.mat');
+Gs = 0:0.01:1;
+Gi = 0:0.004:0.40;
+Gi(101)=1;
+Gr = 0:0.01:1;
 
 lgs = length(Gs)-1;
 lgi = length(Gi)-1;
@@ -170,11 +177,15 @@ beta = 0.2*7;
 theta = 0.25*7;
 gamma = 0.07*7;
 
-s0 = 0.99;
+s0 = 0.9;
 i0 = 0.001;
 r0 = 1-s0-i0;
-transitions0 = importdata('transitions0_greedy_100.mat');
-transitions1 = importdata('transitions1_greedy_100.mat');
+transitions0 = importdata('transitions0_density_100_new.mat');
+transitions1 = importdata('transitions1_density_100_new.mat');
+transitions0 = importdata('transitions0_smart_100.mat');
+transitions1 = importdata('transitions1_smart_100.mat');
+%transitions0 = importdata('transitions0_uniform_100.mat');
+%transitions1 = importdata('transitions1_uniform_100.mat');
 T=10;
 pol = randi(2,T,1)-1;
 pol = zeros(T,1);
@@ -242,10 +253,11 @@ plot(time,trj1(:,1),'r', ...
     time,trj1(:,6),'b--','LineWidth',3);
 ax = gca;
 ax.FontSize = 16; 
-title({'Simulation-Based Discretization'},'Fontsize',18)
+title({'Expert Discretization'},'Fontsize',18)
 xlabel('Time: week','FontSize',18)
 ylabel('Proportions','FontSize',18)
-legend('Simulation-Based S', 'Simulation-Based I','Simulation-Based R','Actual S','Actual I','Actual R','Fontsize',14)
+ylim([0 0.9])
+legend('Expert S', 'Expert I','Expert R','Actual S','Actual I','Actual R','Fontsize',14)
 %% draw eval algo 2
 transitions0 = importdata('transitions0_greedy_100.mat');
 transitions1 = importdata('transitions1_greedy_100.mat');
