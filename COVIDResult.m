@@ -6,15 +6,15 @@ r0 = ones(26,1)-s0-i0;
 % Specify the path to the CSV file
 file_path = 'covid-data/beta.csv';
 % Load the CSV file into a MATLAB array
-beta = readmatrix(file_path);
+beta = 1.3.*readmatrix(file_path);
 gamma = 0.7048;
 costr = 0.005;
 Greedyres1 = importdata('covid-data/greedy_resconstrained.mat');
 Densityres1 = importdata('covid-data/density_resconstrained.mat');
 Uniformres1 = importdata('covid-data/uniform_resconstrained.mat');
-Greedyres = importdata('covid-data/greedy_res.mat');
-Uniformres = importdata('covid-data/uniform_res.mat');
-Densityres = importdata('covid-data/density_res.mat');
+Greedyres = importdata('covid-data/greedy_res_30more.mat');
+Uniformres = importdata('covid-data/uniform_res_30more.mat');
+Densityres = importdata('covid-data/density_res_30more.mat');
 %%
 cdata = zeros(T,7);
 cdata(3:10,1) = 1;

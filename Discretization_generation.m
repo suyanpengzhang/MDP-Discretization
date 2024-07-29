@@ -16,7 +16,7 @@ Gr = [0,0.5,1];
 %Gs = importdata('Gs_greedy_100.mat');
 %Gi = importdata('Gi_greedy_100.mat');
 %Gr = importdata('Gr_greedy_100.mat');
-budget = 30*3;
+budget = 400*3;
 %this is sample state and policy file 
 samples = importdata('samples_for_compare.mat');
 pol_samples = importdata('policy_for_compare.mat');
@@ -198,6 +198,8 @@ function cost = cost_function(S,I,R,S1,I1,R1)
         end
     end
     cost = sum((S1(1:t,1)-S(1:t,1)).^2)+sum((I1(1:t,1)-I(1:t,1)).^2)+sum((R1(1:t,1)-R(1:t,1)).^2);
+    %MAE
+    %cost = mean(abs((S1(1:t,1)-S(1:t,1)))+abs((I1(1:t,1)-I(1:t,1)))+abs((R1(1:t,1)-R(1:t,1))));
 end
 %% functions: Discretized Discrete Time SEIR Model
 %G is the discretization matrix

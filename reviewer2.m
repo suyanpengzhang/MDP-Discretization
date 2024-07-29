@@ -38,7 +38,50 @@ for bs = 1:lgs
     end
 end
 skip = 0;
-[V, policy, cpu_time] = mdp_finite_horizon(P, R, 1, T);
+%%
+V = zeros(length(p0),61);
+policy = zeros(length(p0),60);
+for Tt = 60:-1:1
+    disp(Tt)
+    for i = 1:length(p0)
+        if Tt>49
+            tmp_1 = R(i,1)+p0(i,:)*V(:,Tt+1);
+            tmp2 = 0;
+            tmpp = p1;
+            for tt = Tt:60
+                tmp_2 = tmp_2 + R(i,2)+tmpp(i,:)*R(:,1);
+                tmpp = tmpp*p1;
+            end
+            if tmp_1>tmp_2
+                V(i,Tt) = tmp_1;
+                policy(i,Tt) = 1;
+            else
+                V(i,Tt) = tmp_2;
+                policy(i,Tt) = 2;
+            end
+        else
+            tmp_1 = R(i,1)+p0(i,:)*V(:,Tt+1);
+            tmp2 = 0;
+            tmpp = p1;
+            for tt = 1:11
+                tmp_2 = tmp_2 + R(i,2)+tmpp(i,:)*R(:,1);
+                tmpp = tmpp*p1;
+            end
+            if tmp_1>tmp_2
+                V(i,Tt) = tmp_1;
+                policy(i,Tt) = 1;
+            else
+                V(i,Tt) = tmp_2;
+                policy(i,Tt) = 2;
+            end
+        end
+    end
+end
+    
+%%
+
+
+%[V, policy, cpu_time] = mdp_finite_horizon(P, R, 1, T);
 s0 = 0.9999*ones(26,1);
 i0 = 0.0001*ones(26,1);
 r0 = 0*ones(26,1);

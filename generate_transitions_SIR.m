@@ -1,6 +1,6 @@
-Gs = importdata('Gs_density_400_new.mat');
-Gi = importdata('Gi_density_400_new.mat');
-Gr = importdata('Gr_density_400_new.mat');
+Gs = importdata('Gs_greedy_30_MAE.mat');
+Gi = importdata('Gi_greedy_30_MAE.mat');
+Gr = importdata('Gr_greedy_30_MAE.mat');
 %Gs = 0:0.0025:1;
 %Gi = 0:0.0025:1;
 %Gi = 0:0.001:0.40;

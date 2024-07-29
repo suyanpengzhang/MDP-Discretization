@@ -1,13 +1,13 @@
-p0 = importdata('transitions0_greedy_30.mat');
-p1 = importdata('transitions1_greedy_30.mat');
+p0 = importdata('transitions0_greedy_400.mat');
+p1 = importdata('transitions1_greedy_400.mat');
 %p0 = p0*p0*p0*p0*p0*p0*p0;
 %p1 = p1*p1*p1*p1*p1*p1*p1;
 %p0u = importdata('transitions0_uniform.mat');
 %p1u = importdata('transitions1_uniform.mat');
 %p0u = p0u*p0u*p0u*p0u*p0u*p0p1u = p1u*p1u*p1u*p1u*p1u*p1u*p1u;
-Gs = importdata('Gs_greedy_30.mat');
-Gi = importdata('Gi_greedy_30.mat');
-Gr = importdata('Gr_greedy_30.mat');
+Gs = importdata('Gs_greedy_400.mat');
+Gi = importdata('Gi_greedy_400.mat');
+Gr = importdata('Gr_greedy_400.mat');
 %Gs = 0:0.03333:1;
 %Gi = 0:0.0025:1;
 %Gi = 0:0.013333:0.40;
@@ -93,8 +93,8 @@ while length(Queue)>0
     iter = iter + 1;
 end
 %}
-sv = 0.7:0.01:0.99;
-iv = 0.001:0.001:0.01;
+sv = 0.7:0.005:0.99;
+iv = 0.001:0.0005:0.01;
 count = 1;
 sampless = zeros(length(sv)*length(iv),2);
 for is = 1:length(sv)
@@ -195,255 +195,8 @@ disp('Mean Opt Gap')
 disp(mean(samples(:,9)))
 disp('Median Opt Gap')
 disp(median(samples(:,9)))
-%% Uniform
-
-p0 = importdata('transitions0_uniform_400.mat');
-p1 = importdata('transitions1_uniform_400.mat');
-P{1} = p0;
-P{2} = p1;
-Gs = 0:0.0025:1;
-Gi= 0:0.0025:1;
-Gr = 0:0.0025:1;
-p0 = importdata('transitions0_greedy_30_largec.mat');
-p1 = importdata('transitions1_greedy_30_largec.mat');
-P{1} = p0;
-P{2} = p1;
-%p0 = p0*p0*p0*p0*p0*p0*p0;
-%p1 = p1*p1*p1*p1*p1*p1*p1;
-%p0u = importdata('transitions0_uniform.mat');
-%p1u = importdata('transitions1_uniform.mat');
-%p0u = p0u*p0u*p0u*p0u*p0u*p0p1u = p1u*p1u*p1u*p1u*p1u*p1u*p1u;
-Gs = importdata('Gs_greedy_30.mat');
-Gi = importdata('Gi_greedy_30.mat');
-Gr = importdata('Gr_greedy_30.mat');
-lgs = length(Gs)-1;
-lgi = length(Gi)-1;
-R = ones(length(p0),2);
-for bs = 1:lgs
-    for bi = 1:lgi
-        idx1 = (bs-1)*lgi+bi;
-        R(idx1,1) = -(Gi(bi)+Gi(bi+1))/2;
-        R(idx1,2) = -(Gi(bi)+Gi(bi+1))/2-costr;
-    end
-end
-[V, policy, cpu_time] = mdp_finite_horizon(P, R, 1, 10);
-%%
-sv = 0.7:0.01:0.99;
-iv = 0.001:0.001:0.01;
-cdata = zeros(length(iv),length(sv));
-t = 5;
-for sidx = 1:length(sv)
-    for iidx = 1:length(iv)
-        %disp(sv(sidx))
-        %disp(iv(iidx))
-        vidx = find_index(sv(sidx),iv(iidx),Gs,Gi);
-        polidx = policy(vidx,t);
-        cdata(iidx,sidx) = polidx-1;
-    end
-end
-figure
-h = heatmap(sv,iv,cdata);
-cdata_uniform = cdata;
-h.Title = 'Week 5 -- Uniform';
-h.XLabel = 'Susceptible Proportions';
-h.YLabel = 'Infectious Proportions';
-h.NodeChildren(3).YDir='normal'; 
-%%
-samples1 = zeros(num_samples,10);
-for s =1:num_samples
-    samples1(s,1) = samples(s,1);
-    samples1(s,2) = samples(s,2);
-    samples1(s,3) = samples(s,3);
-    rs = samples1(s,1);
-    ri = samples1(s,2);
-    rr = samples1(s,3);
-    idx = find_index(rs,ri,Gs,Gi);
-    samples1(s,4) = policy(idx,1);
-    samples1(s,5) = V(idx,1);
-    mdp_action = policy(idx,:);
-    %disp(optimal_action)
-    %disp(mdp_action)
-    mis_match = 0;
-    for id_find = 1:length(mdp_action)-skip
-        metric = evaluate_brute_force(id_find,rs,ri,beta,gamma,costr);
-        optimal_action = metric(find(metric(:,11) == max(metric(:,11))),1);
-        if mdp_action(id_find) ~= optimal_action(1)
-            mis_match = mis_match + 1;
-        end
-        if id_find == 1
-            samples1(s,7) = max(metric(:,11));
-        end
-    end
-    samples1(s,10) = mis_match;
-    %samples1(s,6) = metric(find(metric(:,11) == max(metric(:,11))),1);
-    %samples1(s,7) = max(metric(:,11));
-    samples1(s,8) = samples1(s,6)-samples1(s,4);
-    s0 = samples1(s,1);
-    i0 = samples1(s,2);
-    r0 = samples1(s,3);
-    cost = 0;
-    for time = 1:10
-        cost = cost -i0;
-        if policy(find_index(s0,i0,Gs,Gi),time)==2
-            cost = cost -costr;
-        end
-        [s0,i0,r0] = SEIR(s0,i0,r0,beta, gamma,policy(find_index(s0,i0,Gs,Gi),time)-1);
-    end
-    samples1(s,9) = abs(cost-samples1(s,7))/abs(samples1(s,7));
-end
-disp('Uniform')
-disp('Accuracy All')
-disp(1-sum(samples1(:,10))/(num_samples*10))
-disp('MSE')
-disp(mean((samples1(:,5)-samples1(:,7)).^2))
-disp('Mean Approx Error')
-disp(mean(abs(samples1(:,5)-samples1(:,7))./(abs(samples1(:,7))))) %approxmiation error
-disp('Median Approx Error')
-disp(median(abs(samples1(:,5)-samples1(:,7))./(abs(samples1(:,7))))) %approxmiation error
-disp('Mean Opt Gap')
-disp(mean(samples1(:,9)))
-disp('Median Opt Gap')
-disp(median(samples1(:,9)))
-
-%% Lazy Approx
-A = importdata('A_30.mat');
-Vx = importdata('Vx_30.mat');
 
 
-%%
-sv = 0.7:0.01:0.99;
-iv = 0.001:0.001:0.01;
-cdata = zeros(length(iv),length(sv));
-t = 5;
-xxx = 0:0.03333:1;
-for sidx = 1:length(sv)
-    for iidx = 1:length(iv)
-        %disp(sv(sidx))
-        %disp(iv(iidx))
-        vidx = Vx{t}(max(find(xxx<sv(sidx))),max(find(xxx<iv(iidx))));
-        polidx = A{t}(max(find(xxx<sv(sidx))),max(find(xxx<iv(iidx))));
-        cdata(iidx,sidx) = polidx;
-    end
-end
-figure
-h = heatmap(sv,iv,cdata);
-cdata_uniform = cdata;
-h.Title = 'Week 5 -- Uniform';
-h.XLabel = 'Susceptible Proportions';
-h.YLabel = 'Infectious Proportions';
-h.NodeChildren(3).YDir='normal'; 
-%%
-samples2 = zeros(num_samples,10);
-for s =1:num_samples
-    samples2(s,1) = samples(s,1);
-    samples2(s,2) = samples(s,2);
-    samples2(s,3) = samples(s,3);
-    rs = samples2(s,1);
-    ri = samples2(s,2);
-    rr = samples2(s,3);
-    idx = find_index(rs,ri,Gs,Gi);
-    samples2(s,4) = A{1}(max(find(xxx<rs)),max(find(xxx<ri)));
-    samples2(s,5) = -Vx{1}(max(find(xxx<rs)),max(find(xxx<ri)));
-    mdp_action = [A{1}(max(find(xxx<rs)),max(find(xxx<ri))),
-        A{2}(max(find(xxx<rs)),max(find(xxx<ri))),
-        A{3}(max(find(xxx<rs)),max(find(xxx<ri))),
-        A{4}(max(find(xxx<rs)),max(find(xxx<ri))),
-        A{5}(max(find(xxx<rs)),max(find(xxx<ri))),
-        A{6}(max(find(xxx<rs)),max(find(xxx<ri))),
-        A{7}(max(find(xxx<rs)),max(find(xxx<ri))),
-        A{8}(max(find(xxx<rs)),max(find(xxx<ri))),
-        A{9}(max(find(xxx<rs)),max(find(xxx<ri))),
-        A{10}(max(find(xxx<rs)),max(find(xxx<ri)))];
-    %disp(optimal_action)
-    %disp(mdp_action)
-    mis_match = 0;
-    for id_find = 1:length(mdp_action)-skip
-        metric = evaluate_brute_force(id_find,rs,ri,beta,gamma,costr);
-        optimal_action = metric(find(metric(:,11) == max(metric(:,11))),1)-1;
-        if mdp_action(id_find) ~= optimal_action(1)
-            mis_match = mis_match + 1;
-        end
-        if id_find == 1
-            samples2(s,7) = max(metric(:,11));
-        end
-    end
-    samples2(s,10) = mis_match;
-    %samples1(s,6) = metric(find(metric(:,11) == max(metric(:,11))),1);
-    %samples1(s,7) = max(metric(:,11));
-    samples2(s,8) = samples2(s,6)-samples2(s,4);
-    s0 = samples2(s,1);
-    i0 = samples2(s,2);
-    r0 = samples2(s,3);
-    cost = 0;
-    for time = 1:10
-        cost = cost -i0;
-        tempA = A{time};
-        if tempA(max(find(xxx<s0)),max(find(xxx<i0)))==1
-            cost = cost -costr;
-        end
-        [s0,i0,r0] = SEIR(s0,i0,r0,beta, gamma,tempA(max(find(xxx<s0)),max(find(xxx<i0))));
-    end
-    samples2(s,9) = abs(cost-samples2(s,7))/abs(samples2(s,7));
-end
-disp('Lazy Approx')
-disp('Accuracy All')
-disp(1-sum(samples2(:,10))/(num_samples*10))
-disp('MSE')
-disp(mean((samples2(:,5)-samples2(:,7)).^2))
-disp('Mean Approx Error')
-disp(mean(abs(samples2(:,5)-samples2(:,7))./(abs(samples2(:,7))))) %approxmiation error
-disp('Median Approx Error')
-disp(median(abs(samples2(:,5)-samples2(:,7))./(abs(samples2(:,7))))) %approxmiation error
-disp('Mean Opt Gap')
-disp(mean(samples2(:,9)))
-disp('Median Opt Gap')
-disp(median(samples2(:,9)))
-
-                  
-%%
-figure
-sv = 0.7:0.01:0.99;
-iv = 0.001:0.001:0.01;
-cdata = zeros(length(iv),length(sv));
-t = 5;
-for sidx = 1:length(sv)
-    for iidx = 1:length(iv)
-        %disp(sv(sidx))
-        %disp(iv(iidx))
-        metric  = evaluate_brute_force(t,sv(sidx),iv(iidx),beta,gamma,costr);
-        optimal_action = metric(find(metric(:,11) == max(metric(:,11))),1);
-        cdata(iidx,sidx) = optimal_action(1)-1;
-    end
-end
-%(true,model)
-%(0,0)-0
-%(1,1)-1
-%(0,1)-2
-%(1,0)-3
-vdata = zeros(length(iv),length(sv));
-for sidx = 1:length(sv)
-    for iidx = 1:length(iv)
-        if cdata(iidx,sidx) == 0
-            if cdata_greedy(iidx,sidx) == 0
-                vdata(iidx,sidx) = 0;
-            else
-                vdata(iidx,sidx) = 2;
-            end
-        else
-            if cdata_greedy(iidx,sidx) == 0
-                vdata(iidx,sidx) = 3;
-            else
-                vdata(iidx,sidx) = 1;
-            end
-        end
-    end
-end            
-h = heatmap(sv,iv,vdata,'ColorLimits',[0 3]);
-h.Title = 'Week 5 -- Expert Vs Brute Force';
-h.XLabel = 'Susceptible Proportion';
-h.YLabel = 'Infectious Proportion';
-h.FontSize = 14;
-h.NodeChildren(3).YDir='normal';   
 %%
 function metric = evaluate_brute_force(T,rs,ri,beta,gamma,costr)
     T = 11-T; 
